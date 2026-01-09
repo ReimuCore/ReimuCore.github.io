@@ -1,10 +1,90 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>kabikingu</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网站正在建设中</title>
+    <style>
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('fonts/Minecraft.ttf') format('truetype');
+        }
+
+        h1 {
+            font-family: 'Minecraft', sans-serif;
+            letter-spacing: 0.2em;
+            font-size: 3rem;
+            color: #fff;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        /* 每个字的动画 */
+        h1 span {
+            display: inline-block; /* 必须 */
+            animation: float 2s ease-in-out infinite alternate;
+        }
+
+        /* 为每个字增加随机延迟，让浮动不一致 */
+        h1 span:nth-child(1) { animation-delay: 0s; }
+        h1 span:nth-child(2) { animation-delay: 0.1s; }
+        h1 span:nth-child(3) { animation-delay: 0.2s; }
+        h1 span:nth-child(4) { animation-delay: 0.15s; }
+        h1 span:nth-child(5) { animation-delay: 0.05s; }
+        h1 span:nth-child(6) { animation-delay: 0.25s; }
+
+        /* 上下浮动动画 */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }  /* 向上浮动 5px */
+            100% { transform: translateY(0px); }
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "微软雅黑", sans-serif;
+            background:  #7d5ba0;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        p {
+            font-size: 1.2rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0.6; }
+            to { opacity: 1; }
+        }
+
+        .logo {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 2rem;
+            background: url('logo.png') no-repeat center/contain;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+    </style>
 </head>
 <body>
-  <h1>你好 此网站目前正在建设中🚧</h1>
+    <div class="logo"></div>
+    <h1>
+      <span>正</span><span>在</span><span>搭</span><span>建</span><span>魔</span><span>界</span><span>.</span><span>.</span><span>.</span>
+    </h1>
+    <p>敬 请 期 待 ！</p>
+    <div class="footer">建设建议请投至邮箱：484540891@qq.com<br>
+    © 2026 @咔比大王Kingu 社区</div>
 </body>
 </html>
