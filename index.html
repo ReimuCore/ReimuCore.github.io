@@ -18,6 +18,14 @@
             color: #fff;
             margin-bottom: 1rem;
             text-align: center;
+            padding: 0 1rem;
+            word-break: keep-all;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5), 
+                         0 0 20px rgba(200, 150, 255, 0.3);
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         /* 每个字的动画 */
@@ -41,22 +49,46 @@
             100% { transform: translateY(0px); }
         }
 
+        /* 颤抖类 - 使用内联样式，由JavaScript控制，保持浮动动画运行 */
+
         body {
             margin: 0;
             padding: 0;
             font-family: "微软雅黑", sans-serif;
-            background:  #7d5ba0;
+            background: #7d5ba0;
             color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 60vh;
+            min-height: 100vh;
             flex-direction: column;
             text-align: center;
+            position: relative;
+            padding: 0 1rem 80px 1rem;
+            box-sizing: border-box;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            width: 100%;
+            margin-top: -5vh;
+            position: relative;
+            z-index: 1;
         }
 
         p {
+            font-family: 'Minecraft', sans-serif;
             font-size: 1.2rem;
+            padding: 0 1rem;
+            margin: 0.5rem 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         @keyframes fadeIn {
@@ -69,6 +101,7 @@
             height: 150px;
             margin-bottom: 2rem;
             background: url('logo.png') no-repeat center/contain;
+            flex-shrink: 0;
         }
 
         .footer {
@@ -76,16 +109,826 @@
             bottom: 20px;
             font-size: 0.9rem;
             opacity: 0.8;
+            padding: 0 1rem;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+            line-height: 1.6;
+            z-index: 1;
+        }
+
+        .bilibili-link {
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .bilibili-link:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .bilibili-logo {
+            height: 40px;
+            width: auto;
+            vertical-align: middle;
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
+        }
+
+        .bilibili-link:hover .bilibili-logo {
+            opacity: 1;
+        }
+
+        /* 粒子效果画布样式 */
+        #ripple-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* 交互式网格画布样式 */
+        #grid-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* 响应式设计 - 平板设备 (768px - 1024px) */
+        @media screen and (max-width: 1024px) and (min-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+                letter-spacing: 0.15em;
+            }
+
+            p {
+                font-size: 1.1rem;
+            }
+
+            .logo {
+                width: 130px;
+                height: 130px;
+                margin-bottom: 1.5rem;
+            }
+
+            .footer {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* 响应式设计 - 移动设备 (< 768px) */
+        @media screen and (max-width: 767px) {
+            h1 {
+                font-size: 1.8rem;
+                letter-spacing: 0.1em;
+                margin-bottom: 0.8rem;
+                line-height: 1.4;
+            }
+
+            p {
+                font-size: 1rem;
+                margin: 0.3rem 0;
+            }
+
+            .logo {
+                width: 100px;
+                height: 100px;
+                margin-bottom: 1.2rem;
+            }
+
+            .footer {
+                font-size: 0.75rem;
+                bottom: 15px;
+                padding: 0 0.8rem;
+            }
+
+            body {
+                padding: 0 0.8rem 70px 0.8rem;
+                min-height: 100vh;
+            }
+
+            .main-content {
+                margin-top: -3vh;
+            }
+
+            /* 移动端减小浮动幅度 */
+            @keyframes float {
+                0% { transform: translateY(0px); }
+                50% { transform: translateY(-5px); }
+                100% { transform: translateY(0px); }
+            }
+        }
+
+        /* 超小屏幕设备 (< 480px) */
+        @media screen and (max-width: 479px) {
+            h1 {
+                font-size: 1.5rem;
+                letter-spacing: 0.08em;
+                padding: 0 0.5rem;
+            }
+
+            p {
+                font-size: 0.9rem;
+            }
+
+            .logo {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 1rem;
+            }
+
+            .footer {
+                font-size: 0.7rem;
+                bottom: 10px;
+                padding: 0 0.5rem;
+            }
+
+            body {
+                padding: 0 0.5rem 60px 0.5rem;
+            }
+
+            .main-content {
+                margin-top: -2vh;
+            }
+        }
+
+        /* 超大屏幕 (> 1440px) */
+        @media screen and (min-width: 1441px) {
+            h1 {
+                font-size: 3.5rem;
+            }
+
+            p {
+                font-size: 1.3rem;
+            }
+
+            .logo {
+                width: 180px;
+                height: 180px;
+            }
+
+            .footer {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
+    <canvas id="ripple-canvas"></canvas>
+    <canvas id="grid-canvas"></canvas>
+    <div class="main-content">
     <div class="logo"></div>
     <h1>
       <span>正</span><span>在</span><span>搭</span><span>建</span><span>魔</span><span>界</span><span>.</span><span>.</span><span>.</span>
     </h1>
     <p>敬 请 期 待 ！</p>
-    <div class="footer">建设建议请投至邮箱：484540891@qq.com<br>
-    © 2026 @咔比大王Kingu 社区</div>
+    </div>
+    <div class="footer">
+        <a href="https://space.bilibili.com/180368531?spm_id_from=333.1007.0.0" target="_blank" class="bilibili-link">
+            <img src="bilibili.png" alt="Bilibili" class="bilibili-logo">
+        </a>
+        <br>
+        © 2026 @咔比大王Kingu 社区
+    </div>
+    
+    <script>
+        // 交互式网格效果
+        (function() {
+            const canvas = document.getElementById('grid-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 检测是否为移动端
+            const isMobile = window.innerWidth < 768 || 'ontouchstart' in window;
+            
+            // 设置画布大小
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // 网格参数
+            const gridSize = 20;
+            let mouseX = canvas.width / 2;
+            let mouseY = canvas.height / 2;
+            const influenceRadius = 150; // 影响半径
+            
+            // 鼠标位置跟踪（仅在非移动端）
+            if (!isMobile) {
+                document.addEventListener('mousemove', (e) => {
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                });
+            }
+            
+            // 计算点到鼠标的距离
+            function getDistanceToMouse(x, y) {
+                const dx = x - mouseX;
+                const dy = y - mouseY;
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+            
+            // 计算垂直线与圆的交点
+            function getVerticalLineIntersections(x, y1, y2) {
+                const dx = x - mouseX;
+                const distSq = dx * dx;
+                const radiusSq = influenceRadius * influenceRadius;
+                
+                if (distSq > radiusSq) {
+                    return null; // 线在圆外
+                }
+                
+                const halfChord = Math.sqrt(radiusSq - distSq);
+                const intersection1 = mouseY - halfChord;
+                const intersection2 = mouseY + halfChord;
+                
+                // 确保交点在线的范围内
+                const startY = Math.max(y1, intersection1);
+                const endY = Math.min(y2, intersection2);
+                
+                if (startY >= endY) {
+                    return null; // 没有有效交点
+                }
+                
+                return { startY, endY };
+            }
+            
+            // 计算水平线与圆的交点
+            function getHorizontalLineIntersections(y, x1, x2) {
+                const dy = y - mouseY;
+                const distSq = dy * dy;
+                const radiusSq = influenceRadius * influenceRadius;
+                
+                if (distSq > radiusSq) {
+                    return null; // 线在圆外
+                }
+                
+                const halfChord = Math.sqrt(radiusSq - distSq);
+                const intersection1 = mouseX - halfChord;
+                const intersection2 = mouseX + halfChord;
+                
+                // 确保交点在线的范围内
+                const startX = Math.max(x1, intersection1);
+                const endX = Math.min(x2, intersection2);
+                
+                if (startX >= endX) {
+                    return null; // 没有有效交点
+                }
+                
+                return { startX, endX };
+            }
+            
+            // 绘制交互式网格
+            function drawGrid() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 默认网格线样式
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = 1;
+                
+                // 移动端只绘制普通网格，不执行交互效果
+                if (isMobile) {
+                    // 绘制垂直线
+                    for (let x = 0; x <= canvas.width; x += gridSize) {
+                        ctx.beginPath();
+                        ctx.moveTo(x, 0);
+                        ctx.lineTo(x, canvas.height);
+                        ctx.stroke();
+                    }
+                    
+                    // 绘制水平线
+                    for (let y = 0; y <= canvas.height; y += gridSize) {
+                        ctx.beginPath();
+                        ctx.moveTo(0, y);
+                        ctx.lineTo(canvas.width, y);
+                        ctx.stroke();
+                    }
+                    return;
+                }
+                
+                // 桌面端绘制交互式网格
+                // 绘制垂直线
+                for (let x = 0; x <= canvas.width; x += gridSize) {
+                    const intersections = getVerticalLineIntersections(x, 0, canvas.height);
+                    
+                    if (intersections) {
+                        // 绘制圆外的上半部分（暗）
+                        if (intersections.startY > 0) {
+                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                            ctx.beginPath();
+                            ctx.moveTo(x, 0);
+                            ctx.lineTo(x, intersections.startY);
+                            ctx.stroke();
+                        }
+                        
+                        // 绘制圆内的部分（亮，渐变）
+                        const segments = 20; // 分段绘制以实现渐变
+                        for (let i = 0; i < segments; i++) {
+                            const y1 = intersections.startY + (intersections.endY - intersections.startY) * (i / segments);
+                            const y2 = intersections.startY + (intersections.endY - intersections.startY) * ((i + 1) / segments);
+                            const midY = (y1 + y2) / 2;
+                            
+                            const dist = getDistanceToMouse(x, midY);
+                            const influence = 1 - (dist / influenceRadius);
+                            const opacity = 0.1 + influence * 0.4;
+                            
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+                            ctx.beginPath();
+                            ctx.moveTo(x, y1);
+                            ctx.lineTo(x, y2);
+                            ctx.stroke();
+                        }
+                        
+                        // 绘制圆外的下半部分（暗）
+                        if (intersections.endY < canvas.height) {
+                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                            ctx.beginPath();
+                            ctx.moveTo(x, intersections.endY);
+                            ctx.lineTo(x, canvas.height);
+                            ctx.stroke();
+                        }
+                    } else {
+                        // 整条线都在圆外，绘制暗线
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                        ctx.beginPath();
+                        ctx.moveTo(x, 0);
+                        ctx.lineTo(x, canvas.height);
+                        ctx.stroke();
+                    }
+                }
+                
+                // 绘制水平线
+                for (let y = 0; y <= canvas.height; y += gridSize) {
+                    const intersections = getHorizontalLineIntersections(y, 0, canvas.width);
+                    
+                    if (intersections) {
+                        // 绘制圆外的左半部分（暗）
+                        if (intersections.startX > 0) {
+                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                            ctx.beginPath();
+                            ctx.moveTo(0, y);
+                            ctx.lineTo(intersections.startX, y);
+                            ctx.stroke();
+                        }
+                        
+                        // 绘制圆内的部分（亮，渐变）
+                        const segments = 20; // 分段绘制以实现渐变
+                        for (let i = 0; i < segments; i++) {
+                            const x1 = intersections.startX + (intersections.endX - intersections.startX) * (i / segments);
+                            const x2 = intersections.startX + (intersections.endX - intersections.startX) * ((i + 1) / segments);
+                            const midX = (x1 + x2) / 2;
+                            
+                            const dist = getDistanceToMouse(midX, y);
+                            const influence = 1 - (dist / influenceRadius);
+                            const opacity = 0.1 + influence * 0.4;
+                            
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+                            ctx.beginPath();
+                            ctx.moveTo(x1, y);
+                            ctx.lineTo(x2, y);
+                            ctx.stroke();
+                        }
+                        
+                        // 绘制圆外的右半部分（暗）
+                        if (intersections.endX < canvas.width) {
+                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                            ctx.beginPath();
+                            ctx.moveTo(intersections.endX, y);
+                            ctx.lineTo(canvas.width, y);
+                            ctx.stroke();
+                        }
+                    } else {
+                        // 整条线都在圆外，绘制暗线
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                        ctx.beginPath();
+                        ctx.moveTo(0, y);
+                        ctx.lineTo(canvas.width, y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            // 动画循环
+            function animate() {
+                drawGrid();
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        })();
+    </script>
+    
+    <script>
+        // 标题点击颤抖效果（随机动画）
+        (function() {
+            const h1 = document.querySelector('h1');
+            const spans = h1.querySelectorAll('span');
+            
+            // 初始化页面加载时间
+            if (!window.pageLoadStartTime) {
+                window.pageLoadStartTime = performance.now();
+            }
+            
+            // 存储每个span的颤抖动画ID
+            const shakeAnimationIds = new Map();
+            
+            // 存储每个span的颤抖状态
+            const shakeStates = new Map();
+            
+            // 存储每个span的点击次数
+            const clickCounts = new Map();
+            
+            // 存储已掉落的span（不再参与浮动）
+            const fallenSpans = new Set();
+            
+            // 全局浮动控制（所有字共享一个循环）
+            let globalFloatAnimationId = null;
+            let isManualControl = false;
+            
+            // 预先存储每个字的延迟（避免每次计算）
+            const spanDelays = new Map();
+            spans.forEach(span => {
+                const delayStr = getComputedStyle(span).animationDelay;
+                // 解析延迟（可能是 "0.1s" 或 "100ms" 格式）
+                const delay = parseFloat(delayStr) * (delayStr.includes('ms') ? 1 : 1000);
+                spanDelays.set(span, delay);
+            });
+            
+            // 计算浮动位置的函数
+            const getFloatY = (span, currentTime) => {
+                const delay = spanDelays.get(span) || 0;
+                const floatDuration = 2000; // 2秒
+                const cycleDuration = floatDuration * 2; // 完整周期4秒（alternate模式）
+                
+                // 计算从页面加载开始的总时间
+                const totalElapsed = currentTime - window.pageLoadStartTime;
+                
+                // 应用延迟，计算该字的动画时间
+                const adjustedElapsed = (totalElapsed - delay + cycleDuration) % cycleDuration;
+                
+                // 判断是哪个周期（用于alternate模式）
+                const cycleIndex = Math.floor((totalElapsed - delay + cycleDuration) / cycleDuration);
+                const isReversed = cycleIndex % 2 === 1;
+                
+                // 计算在当前周期内的位置
+                let timeInCycle = adjustedElapsed;
+                if (isReversed) {
+                    timeInCycle = cycleDuration - adjustedElapsed;
+                }
+                
+                // 计算进度（0到1）
+                let progress;
+                if (timeInCycle < floatDuration) {
+                    // 前半段：从0到-8px
+                    progress = timeInCycle / floatDuration;
+                } else {
+                    // 后半段：从-8px回到0
+                    progress = (timeInCycle - floatDuration) / floatDuration;
+                    progress = 1 - progress;
+                }
+                
+                // ease-in-out缓动
+                progress = progress < 0.5 
+                    ? 2 * progress * progress 
+                    : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+                
+                return -8 * progress;
+            };
+            
+            // 全局浮动更新函数
+            const updateAllFloats = (currentTime) => {
+                spans.forEach(span => {
+                    // 如果已掉落，跳过
+                    if (fallenSpans.has(span)) {
+                        return;
+                    }
+                    
+                    const shakeState = shakeStates.get(span);
+                    if (shakeState && shakeState.isShaking) {
+                        // 正在颤抖，不更新（由颤抖动画更新）
+                        return;
+                    }
+                    
+                    // 更新浮动位置
+                    const floatY = getFloatY(span, currentTime);
+                    span.style.transform = `translateY(${floatY}px)`;
+                });
+                
+                globalFloatAnimationId = requestAnimationFrame(updateAllFloats);
+            };
+            
+            // 启动手动控制（第一次点击时）
+            const startManualControl = () => {
+                if (!isManualControl) {
+                    spans.forEach(span => {
+                        span.style.animation = 'none';
+                    });
+                    isManualControl = true;
+                    globalFloatAnimationId = requestAnimationFrame(updateAllFloats);
+                }
+            };
+            
+            spans.forEach(span => {
+                // 初始化点击计数
+                clickCounts.set(span, 0);
+                
+                span.addEventListener('click', function() {
+                    // 如果已经掉落，不再响应点击
+                    if (fallenSpans.has(this)) {
+                        return;
+                    }
+                    
+                    // 增加点击计数
+                    const currentCount = clickCounts.get(this) || 0;
+                    const newCount = currentCount + 1;
+                    clickCounts.set(this, newCount);
+                    
+                    // 如果达到10次，触发掉落
+                    if (newCount >= 10) {
+                        triggerFall(this);
+                        return;
+                    }
+                    
+                    // 启动手动控制（如果是第一次）
+                    startManualControl();
+                    
+                    // 如果已经有颤抖动画在运行，先取消
+                    if (shakeAnimationIds.has(this)) {
+                        cancelAnimationFrame(shakeAnimationIds.get(this));
+                        shakeAnimationIds.delete(this);
+                    }
+                    
+                    // 生成随机参数
+                    const intensity = Math.random() * 4 + 2; // 2-6px的强度
+                    const rotationIntensity = Math.random() * 3 + 1; // 1-4度的旋转
+                    const duration = Math.random() * 200 + 300; // 300-500ms的持续时间
+                    
+                    const startTime = performance.now();
+                    
+                    // 设置颤抖状态
+                    shakeStates.set(this, { isShaking: true });
+                    
+                    // 添加颤抖类
+                    this.classList.add('shake');
+                    
+                    const animate = (currentTime) => {
+                        const elapsed = currentTime - startTime;
+                        const progress = elapsed / duration;
+                        
+                        // 获取当前浮动位置
+                        const floatY = getFloatY(this, currentTime);
+                        
+                        if (progress >= 1) {
+                            // 颤抖结束
+                            this.classList.remove('shake');
+                            shakeStates.set(this, { isShaking: false });
+                            
+                            // 如果已掉落，不恢复浮动位置
+                            if (!fallenSpans.has(this)) {
+                                // 恢复浮动位置（由全局循环控制）
+                                this.style.transform = `translateY(${floatY}px)`;
+                            }
+                            shakeAnimationIds.delete(this);
+                            return;
+                        }
+                        
+                        // 缓动函数
+                        const easeOut = 1 - Math.pow(1 - progress, 3);
+                        
+                        // 生成随机颤抖值
+                        const shakeX = (Math.random() - 0.5) * intensity * 2 * (1 - easeOut);
+                        const shakeY = (Math.random() - 0.5) * intensity * 2 * (1 - easeOut);
+                        const shakeRotate = (Math.random() - 0.5) * rotationIntensity * 2 * (1 - easeOut);
+                        
+                        // 叠加颤抖效果
+                        this.style.transform = `translateY(${floatY}px) translate(${shakeX}px, ${shakeY}px) rotate(${shakeRotate}deg)`;
+                        
+                        // 继续动画
+                        const id = requestAnimationFrame(animate);
+                        shakeAnimationIds.set(this, id);
+                    };
+                    
+                    // 开始动画
+                    const id = requestAnimationFrame(animate);
+                    shakeAnimationIds.set(this, id);
+                });
+            });
+            
+            // 掉落动画函数
+            function triggerFall(span) {
+                // 标记为已掉落
+                fallenSpans.add(span);
+                
+                // 取消任何正在进行的动画
+                if (shakeAnimationIds.has(span)) {
+                    cancelAnimationFrame(shakeAnimationIds.get(span));
+                    shakeAnimationIds.delete(span);
+                }
+                shakeStates.set(span, { isShaking: false });
+                
+                // 获取当前位置和尺寸
+                const rect = span.getBoundingClientRect();
+                const startY = rect.top + window.scrollY;
+                const startX = rect.left + window.scrollX;
+                const endY = document.documentElement.scrollHeight - rect.height - 20; // 页面底部，留20px边距
+                
+                // 创建一个占位元素来保持空间
+                const placeholder = document.createElement('span');
+                placeholder.style.display = 'inline-block';
+                placeholder.style.width = rect.width + 'px';
+                placeholder.style.height = rect.height + 'px';
+                placeholder.style.visibility = 'hidden';
+                placeholder.style.verticalAlign = 'baseline';
+                placeholder.style.margin = '0';
+                placeholder.style.padding = '0';
+                // 复制原元素的letter-spacing（如果有）
+                const computedStyle = window.getComputedStyle(span);
+                placeholder.style.letterSpacing = computedStyle.letterSpacing;
+                // 插入占位元素
+                span.parentNode.insertBefore(placeholder, span);
+                
+                // 计算掉落距离
+                const fallDistance = endY - startY;
+                const fallDuration = 1000; // 1秒掉落时间
+                const startTime = performance.now();
+                
+                // 添加掉落类
+                span.classList.add('falling');
+                
+                // 切换到fixed定位
+                span.style.position = 'fixed';
+                span.style.left = startX + 'px';
+                span.style.top = startY + 'px';
+                span.style.zIndex = '1000';
+                span.style.transform = 'translateY(0)'; // 清除之前的transform
+                
+                // 掉落动画
+                function fallAnimate(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / fallDuration, 1);
+                    
+                    // 使用重力加速度曲线（ease-in，模拟重力）
+                    const easeIn = progress * progress;
+                    
+                    // 计算当前位置
+                    const currentY = startY + fallDistance * easeIn;
+                    
+                    // 添加旋转效果（掉落时旋转）
+                    const rotation = progress * 360; // 掉落时旋转360度
+                    
+                    // 应用位置和旋转
+                    span.style.top = currentY + 'px';
+                    span.style.transform = `rotate(${rotation}deg)`;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(fallAnimate);
+                    } else {
+                        // 掉落完成
+                        span.classList.remove('falling');
+                        span.style.top = endY + 'px';
+                        span.style.transform = 'rotate(0deg)';
+                    }
+                }
+                
+                requestAnimationFrame(fallAnimate);
+            }
+        })();
+    </script>
+    
+    <script>
+        // 点击小方块飞散效果
+        (function() {
+            const canvas = document.getElementById('ripple-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 设置画布大小
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // 重力常量
+            const gravity = 0.04;
+            
+            // 小方块粒子类
+            class Particle {
+                constructor(x, y) {
+                    this.x = x;
+                    this.y = y;
+                    // 随机方向（0到2π）
+                    const angle = Math.random() * Math.PI * 2;
+                    // 随机速度（减慢：0.5到2）
+                    const speed = Math.random() * 1.5 + 0.5;
+                    this.vx = Math.cos(angle) * speed;
+                    this.vy = Math.sin(angle) * speed;
+                    // 随机大小（4到10像素）
+                    this.size = Math.random() * 6 + 4;
+                    // 初始透明度
+                    this.opacity = 1;
+                    // 渐隐速度（稍微减慢，因为飞行时间更长）
+                    this.fadeSpeed = Math.random() * 0.015 + 0.008;
+                    // 随机旋转速度
+                    this.rotation = 0;
+                    this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+                }
+                
+                update() {
+                    // 应用重力（只影响垂直速度）
+                    this.vy += gravity;
+                    
+                    // 更新位置
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    // 更新旋转
+                    this.rotation += this.rotationSpeed;
+                    // 渐隐
+                    this.opacity -= this.fadeSpeed;
+                    // 如果透明度小于0或超出屏幕，返回false表示需要移除
+                    return this.opacity > 0 && 
+                           this.x > -this.size && this.x < canvas.width + this.size &&
+                           this.y > -this.size && this.y < canvas.height + this.size;
+                }
+                
+                draw() {
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.rotation);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                    ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+                    ctx.restore();
+                }
+            }
+            
+            // 粒子数组
+            const particles = [];
+            
+            // 根据屏幕尺寸获取粒子数量
+            function getParticleCount() {
+                if (window.innerWidth < 768) {
+                    // 移动端：2-4个粒子
+                    return Math.floor(Math.random() * 3) + 2;
+                } else {
+                    // 桌面端：5-10个粒子
+                    return Math.floor(Math.random() * 6) + 5;
+                }
+            }
+            
+            // 点击事件监听（绑定到document，这样即使canvas有pointer-events: none也能触发）
+            document.addEventListener('click', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                // 根据屏幕尺寸创建不同数量的粒子
+                const count = getParticleCount();
+                for (let i = 0; i < count; i++) {
+                    particles.push(new Particle(x, y));
+                }
+            });
+            
+            // 触摸事件监听（移动端）
+            document.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                // 移动端使用更少的粒子
+                const count = getParticleCount();
+                for (let i = 0; i < count; i++) {
+                    particles.push(new Particle(x, y));
+                }
+            });
+            
+            // 动画循环
+            function animate() {
+                // 清除画布
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 更新和绘制粒子
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const particle = particles[i];
+                    if (particle.update()) {
+                        particle.draw();
+                    } else {
+                        particles.splice(i, 1);
+                    }
+                }
+                
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        })();
+    </script>
 </body>
 </html>
