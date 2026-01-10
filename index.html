@@ -291,7 +291,7 @@
     <p>敬 请 期 待 ！</p>
     </div>
     <div class="footer">
-        <a href="https://space.bilibili.com/180368531?spm_id_from=333.1007.0.0" target="_blank" class="bilibili-link">
+        <a href="https://space.bilibili.com/3493274442533075/" target="_blank" class="bilibili-link">
             <img src="bilibili.png" alt="Bilibili" class="bilibili-logo">
         </a>
         <br>
@@ -549,10 +549,6 @@
             // 存储已掉落的span（不再参与浮动）
             const fallenSpans = new Set();
             
-            // 全局浮动控制（所有字共享一个循环）
-            let globalFloatAnimationId = null;
-            let isManualControl = false;
-            
             // 预先存储每个字的延迟（避免每次计算）
             const spanDelays = new Map();
             spans.forEach(span => {
@@ -603,38 +599,57 @@
                 return -8 * progress;
             };
             
-            // 全局浮动更新函数
-            const updateAllFloats = (currentTime) => {
-                spans.forEach(span => {
-                    // 如果已掉落，跳过
-                    if (fallenSpans.has(span)) {
-                        return;
-                    }
-                    
-                    const shakeState = shakeStates.get(span);
-                    if (shakeState && shakeState.isShaking) {
-                        // 正在颤抖，不更新（由颤抖动画更新）
-                        return;
-                    }
-                    
-                    // 更新浮动位置
-                    const floatY = getFloatY(span, currentTime);
-                    span.style.transform = `translateY(${floatY}px)`;
-                });
+            // 计算当前应该处于动画周期的哪个位置（以秒为单位）
+            // 返回的值可以直接用作负的animation-delay
+            const getAnimationTimeInCycle = (span, currentTime) => {
+                const delay = spanDelays.get(span) || 0;
+                const floatDuration = 2000; // 2秒（每个方向）
                 
-                globalFloatAnimationId = requestAnimationFrame(updateAllFloats);
+                // 计算从页面加载开始的总时间
+                const totalElapsed = currentTime - window.pageLoadStartTime;
+                
+                // 应用延迟，计算该字的动画时间
+                // 对于alternate模式，我们需要计算在当前2秒周期内的位置
+                const adjustedElapsed = (totalElapsed - delay) % (floatDuration * 2);
+                
+                // 判断是正向还是反向周期
+                const cycleIndex = Math.floor((totalElapsed - delay) / (floatDuration * 2));
+                const isReversed = cycleIndex % 2 === 1;
+                
+                // 计算在当前2秒周期内的位置（0-2秒）
+                let timeInCycle = adjustedElapsed % floatDuration;
+                if (isReversed) {
+                    // 反向周期：从2秒倒计时到0秒
+                    timeInCycle = floatDuration - timeInCycle;
+                }
+                
+                return timeInCycle / 1000; // 转换为秒
             };
             
-            // 启动手动控制（第一次点击时）
-            const startManualControl = () => {
-                if (!isManualControl) {
-                    spans.forEach(span => {
-                        span.style.animation = 'none';
-                    });
-                    isManualControl = true;
-                    globalFloatAnimationId = requestAnimationFrame(updateAllFloats);
+            // 解析transform中的translateY值
+            function parseTranslateY(transform) {
+                if (!transform || transform === 'none') {
+                    return 0;
                 }
-            };
+                
+                // 尝试匹配 translateY(...)
+                const translateYMatch = transform.match(/translateY\(([^)]+)\)/);
+                if (translateYMatch) {
+                    return parseFloat(translateYMatch[1]);
+                }
+                
+                // 尝试匹配 matrix 或 matrix3d
+                const matrixMatch = transform.match(/matrix\([^)]+\)|matrix3d\([^)]+\)/);
+                if (matrixMatch) {
+                    const values = matrixMatch[0].match(/[\d.-]+/g);
+                    if (values && values.length >= 6) {
+                        // matrix(a, b, c, d, tx, ty) 中，ty是第6个值（索引5）
+                        return parseFloat(values[5]) || 0;
+                    }
+                }
+                
+                return 0;
+            }
             
             spans.forEach(span => {
                 // 初始化点击计数
@@ -657,9 +672,6 @@
                         return;
                     }
                     
-                    // 启动手动控制（如果是第一次）
-                    startManualControl();
-                    
                     // 如果已经有颤抖动画在运行，先取消
                     if (shakeAnimationIds.has(this)) {
                         cancelAnimationFrame(shakeAnimationIds.get(this));
@@ -671,54 +683,86 @@
                     const rotationIntensity = Math.random() * 3 + 1; // 1-4度的旋转
                     const duration = Math.random() * 200 + 300; // 300-500ms的持续时间
                     
-                    const startTime = performance.now();
-                    
                     // 设置颤抖状态
                     shakeStates.set(this, { isShaking: true });
                     
                     // 添加颤抖类
                     this.classList.add('shake');
                     
-                    const animate = (currentTime) => {
-                        const elapsed = currentTime - startTime;
-                        const progress = elapsed / duration;
+                    // 使用requestAnimationFrame确保在下一帧开始，避免掉帧
+                    const startShake = () => {
+                        const currentTime = performance.now();
                         
-                        // 获取当前浮动位置
-                        const floatY = getFloatY(this, currentTime);
+                        // 在开始颤抖前，读取CSS动画的当前位置
+                        const computedStyle = window.getComputedStyle(this);
+                        const cssTransform = computedStyle.transform;
+                        const initialTranslateY = parseTranslateY(cssTransform);
                         
-                        if (progress >= 1) {
-                            // 颤抖结束
-                            this.classList.remove('shake');
-                            shakeStates.set(this, { isShaking: false });
+                        // 临时禁用CSS动画（只对这个元素）
+                        this.style.animation = 'none';
+                        
+                        // 先应用当前位置，避免跳跃
+                        this.style.transform = `translateY(${initialTranslateY}px)`;
+                        
+                        const startTime = currentTime;
+                        
+                        const animate = () => {
+                            const currentTime = performance.now();
+                            const elapsed = currentTime - startTime;
+                            const progress = elapsed / duration;
                             
-                            // 如果已掉落，不恢复浮动位置
-                            if (!fallenSpans.has(this)) {
-                                // 恢复浮动位置（由全局循环控制）
-                                this.style.transform = `translateY(${floatY}px)`;
+                            if (progress >= 1) {
+                                // 颤抖结束
+                                this.classList.remove('shake');
+                                shakeStates.set(this, { isShaking: false });
+                                
+                                // 如果已掉落，不恢复
+                                if (!fallenSpans.has(this)) {
+                                    // 计算当前应该处于动画周期的位置（秒）
+                                    const animationTime = getAnimationTimeInCycle(this, currentTime);
+                                    
+                                    // 获取原来的delay（秒）
+                                    const originalDelay = spanDelays.get(this) || 0;
+                                    const originalDelaySeconds = originalDelay / 1000;
+                                    
+                                    // 恢复CSS动画，使用负的animation-delay来从当前位置继续
+                                    // 负的delay让动画从周期的某个位置开始，再加上原来的delay保持参差效果
+                                    this.style.animation = '';
+                                    this.style.animationDelay = `${-animationTime + originalDelaySeconds}s`;
+                                    
+                                    // 移除内联transform，让CSS动画接管
+                                    this.style.transform = '';
+                                }
+                                shakeAnimationIds.delete(this);
+                                return;
                             }
-                            shakeAnimationIds.delete(this);
-                            return;
-                        }
+                            
+                            // 手动计算浮动位置（使用当前时间，确保与CSS动画同步）
+                            const floatY = getFloatY(this, currentTime);
+                            
+                            // 缓动函数
+                            const easeOut = 1 - Math.pow(1 - progress, 3);
+                            
+                            // 生成随机颤抖值
+                            const shakeX = (Math.random() - 0.5) * intensity * 2 * (1 - easeOut);
+                            const shakeY = (Math.random() - 0.5) * intensity * 2 * (1 - easeOut);
+                            const shakeRotate = (Math.random() - 0.5) * rotationIntensity * 2 * (1 - easeOut);
+                            
+                            // 组合transform：手动浮动的translateY + 颤抖的translate和rotate
+                            this.style.transform = `translateY(${floatY}px) translate(${shakeX}px, ${shakeY}px) rotate(${shakeRotate}deg)`;
+                            
+                            // 继续动画
+                            const id = requestAnimationFrame(animate);
+                            shakeAnimationIds.set(this, id);
+                        };
                         
-                        // 缓动函数
-                        const easeOut = 1 - Math.pow(1 - progress, 3);
-                        
-                        // 生成随机颤抖值
-                        const shakeX = (Math.random() - 0.5) * intensity * 2 * (1 - easeOut);
-                        const shakeY = (Math.random() - 0.5) * intensity * 2 * (1 - easeOut);
-                        const shakeRotate = (Math.random() - 0.5) * rotationIntensity * 2 * (1 - easeOut);
-                        
-                        // 叠加颤抖效果
-                        this.style.transform = `translateY(${floatY}px) translate(${shakeX}px, ${shakeY}px) rotate(${shakeRotate}deg)`;
-                        
-                        // 继续动画
+                        // 开始动画循环
                         const id = requestAnimationFrame(animate);
                         shakeAnimationIds.set(this, id);
                     };
                     
-                    // 开始动画
-                    const id = requestAnimationFrame(animate);
-                    shakeAnimationIds.set(this, id);
+                    // 在下一帧开始颤抖动画，避免掉帧
+                    requestAnimationFrame(startShake);
                 });
             });
             
@@ -740,6 +784,15 @@
                 const startX = rect.left + window.scrollX;
                 const endY = document.documentElement.scrollHeight - rect.height - 20; // 页面底部，留20px边距
                 
+                // 先切换到fixed定位，避免影响其他元素的布局
+                span.style.position = 'fixed';
+                span.style.left = startX + 'px';
+                span.style.top = startY + 'px';
+                span.style.zIndex = '1000';
+                
+                // 强制浏览器完成布局计算
+                void span.offsetHeight;
+                
                 // 创建一个占位元素来保持空间
                 const placeholder = document.createElement('span');
                 placeholder.style.display = 'inline-block';
@@ -752,7 +805,7 @@
                 // 复制原元素的letter-spacing（如果有）
                 const computedStyle = window.getComputedStyle(span);
                 placeholder.style.letterSpacing = computedStyle.letterSpacing;
-                // 插入占位元素
+                // 插入占位元素（此时span已经是fixed，不会影响其他元素）
                 span.parentNode.insertBefore(placeholder, span);
                 
                 // 计算掉落距离
@@ -763,11 +816,8 @@
                 // 添加掉落类
                 span.classList.add('falling');
                 
-                // 切换到fixed定位
-                span.style.position = 'fixed';
-                span.style.left = startX + 'px';
-                span.style.top = startY + 'px';
-                span.style.zIndex = '1000';
+                // 禁用CSS动画（避免覆盖掉落动画的transform）
+                span.style.animation = 'none';
                 span.style.transform = 'translateY(0)'; // 清除之前的transform
                 
                 // 掉落动画
