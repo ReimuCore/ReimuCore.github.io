@@ -104,6 +104,23 @@
             flex-shrink: 0;
         }
 
+        .top-link {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 0.9rem;
+            color: #fff;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        .top-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
         .footer {
             position: absolute;
             bottom: 20px;
@@ -203,6 +220,12 @@
                 margin-bottom: 1.2rem;
             }
 
+            .top-link {
+                top: 15px;
+                right: 15px;
+                font-size: 0.8rem;
+            }
+
             .footer {
                 font-size: 0.75rem;
                 bottom: 15px;
@@ -281,6 +304,7 @@
     </style>
 </head>
 <body>
+    <a href="/home" class="top-link">查看正在建设的界面</a>
     <canvas id="ripple-canvas"></canvas>
     <canvas id="grid-canvas"></canvas>
     <div class="main-content">
@@ -292,7 +316,7 @@
     </div>
     <div class="footer">
         <a href="https://space.bilibili.com/3493274442533075/" target="_blank" class="bilibili-link">
-            <img src="bilibili.png" alt="Bilibili" class="bilibili-logo">
+            <img src="/static/bilibili.png" alt="Bilibili" class="bilibili-logo">
         </a>
         <br>
         © 2026 @咔比大王Kingu 社区
@@ -784,15 +808,6 @@
                 const startX = rect.left + window.scrollX;
                 const endY = document.documentElement.scrollHeight - rect.height - 20; // 页面底部，留20px边距
                 
-                // 先切换到fixed定位，避免影响其他元素的布局
-                span.style.position = 'fixed';
-                span.style.left = startX + 'px';
-                span.style.top = startY + 'px';
-                span.style.zIndex = '1000';
-                
-                // 强制浏览器完成布局计算
-                void span.offsetHeight;
-                
                 // 创建一个占位元素来保持空间
                 const placeholder = document.createElement('span');
                 placeholder.style.display = 'inline-block';
@@ -805,7 +820,7 @@
                 // 复制原元素的letter-spacing（如果有）
                 const computedStyle = window.getComputedStyle(span);
                 placeholder.style.letterSpacing = computedStyle.letterSpacing;
-                // 插入占位元素（此时span已经是fixed，不会影响其他元素）
+                // 插入占位元素
                 span.parentNode.insertBefore(placeholder, span);
                 
                 // 计算掉落距离
@@ -816,8 +831,11 @@
                 // 添加掉落类
                 span.classList.add('falling');
                 
-                // 禁用CSS动画（避免覆盖掉落动画的transform）
-                span.style.animation = 'none';
+                // 切换到fixed定位
+                span.style.position = 'fixed';
+                span.style.left = startX + 'px';
+                span.style.top = startY + 'px';
+                span.style.zIndex = '1000';
                 span.style.transform = 'translateY(0)'; // 清除之前的transform
                 
                 // 掉落动画

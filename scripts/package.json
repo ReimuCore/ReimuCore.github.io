@@ -1,0 +1,12 @@
+{
+  "name": "kabikingu-site",
+  "version": "2.0.0",
+  "description": "Kabikingu Site - B站用户统计展示",
+  "type": "commonjs",
+  "keywords": [
+    "bilibili",
+    "cloudflare-workers"
+  ],
+  "author": "",
+  "license": "MIT"
+}
