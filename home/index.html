@@ -657,20 +657,8 @@
             margin-bottom: 0;
             position: relative;
             z-index: 1;
-            animation: fadeInUp 1s ease-out 0.8s both;
             flex-shrink: 0;
             width: 100%;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .footer-content {
@@ -712,6 +700,101 @@
             text-align: center;
             color: rgba(255, 255, 255, 0.6);
             font-size: 0.85rem;
+        }
+
+        .footer-image {
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 250px;
+            width: auto;
+            height: auto;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            z-index: 2;
+        }
+
+        .footer-image:hover {
+            opacity: 1;
+        }
+
+        .footer-image-bottom {
+            position: fixed;
+            bottom: -200px;
+            left: 47%;
+            transform: translateX(-50%);
+            max-width: 1200px;
+            width: auto;
+            height: auto;
+            opacity: 0;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
+            z-index: 0;
+            pointer-events: none;
+            cursor: pointer;
+            animation: slideUpFadeIn 1s ease-out 0s both;
+        }
+
+        .footer-image-bottom::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            z-index: 3;
+            pointer-events: auto;
+            cursor: pointer;
+            opacity: 1;
+        }
+
+        .footer-image-bottom:hover::before {
+            border-color: rgba(255, 255, 255, 1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .footer-image-bottom:hover {
+            transform: translateX(-50%) translateY(-30px);
+        }
+
+        .footer-hover-area {
+            position: fixed;
+            bottom: -220px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 250px;
+            height: 600px;
+            border: none;
+            border-radius: 15px;
+            background: transparent;
+            z-index: 10;
+            pointer-events: auto;
+            cursor: pointer;
+            box-shadow: none;
+        }
+
+        .footer-hover-area:hover {
+            border: none;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .footer-hover-area:hover ~ .footer-image-bottom {
+            transform: translateX(-50%) translateY(-100px);
+        }
+
+        @keyframes slideUpFadeIn {
+            from {
+                bottom: -400px;
+                opacity: 0;
+            }
+            to {
+                bottom: -200px;
+                opacity: 0.9;
+            }
         }
 
         /* 顶栏返回按钮 */
@@ -948,8 +1031,11 @@
     </div>
 
     <!-- 页脚 -->
+    <div class="footer-hover-area"></div>
+    <img src="/static/footer-png2.png" alt="Footer Bottom" class="footer-image-bottom">
     <footer>
         <div class="footer-content">
+            <img src="/static/footer-png1.png" alt="Footer" class="footer-image">
             <div class="footer-links">
                 <a href="#about">关于本站</a>
                 <span class="separator">|</span>
@@ -1322,6 +1408,32 @@
 
         // 每3秒更新一次
         setInterval(fetchUserCard, UPDATE_INTERVAL);
+
+        // footer-png2 悬停弹跳效果（使用 transform）
+        const hoverArea = document.querySelector('.footer-hover-area');
+        const footerImageBottom = document.querySelector('.footer-image-bottom');
+
+        if (hoverArea && footerImageBottom) {
+            let bounceTimeout = null;
+
+            hoverArea.addEventListener('mouseenter', function() {
+                // 清除之前的定时器
+                if (bounceTimeout) clearTimeout(bounceTimeout);
+                
+                // 先移动到 -100px
+                footerImageBottom.style.transform = 'translateX(-50%) translateY(-100px)';
+                
+                // 延迟后回弹到 -90px
+                bounceTimeout = setTimeout(() => {
+                    footerImageBottom.style.transform = 'translateX(-50%) translateY(-90px)';
+                }, 300);
+            });
+
+            hoverArea.addEventListener('mouseleave', function() {
+                if (bounceTimeout) clearTimeout(bounceTimeout);
+                footerImageBottom.style.transform = 'translateX(-50%) translateY(0)';
+            });
+        }
     </script>
 </body>
 </html>
