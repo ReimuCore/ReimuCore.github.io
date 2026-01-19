@@ -649,8 +649,7 @@
 
         /* 页脚 */
         footer {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
+            background: transparent;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding: 2rem 2rem;
             margin-top: auto;
@@ -659,7 +658,25 @@
             z-index: 1;
             flex-shrink: 0;
             width: 100%;
+            overflow-x: visible;
+            overflow-y: visible;
+            clip-path: inset(-1000px 0 0 0);
+            contain: layout;
         }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: -250px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 1;
+            pointer-events: none;
+        }
+
 
         .footer-content {
             max-width: 1200px;
@@ -668,6 +685,8 @@
             flex-direction: column;
             align-items: center;
             gap: 0.8rem;
+            position: relative;
+            z-index: 2;
         }
 
         .footer-links {
@@ -704,7 +723,7 @@
 
         .footer-image {
             position: absolute;
-            top: -24px;
+            top: -56px;
             left: 50%;
             transform: translateX(-50%);
             max-width: 250px;
@@ -720,7 +739,7 @@
         }
 
         .footer-image-bottom {
-            position: fixed;
+            position: absolute;
             bottom: -200px;
             left: 47%;
             transform: translateX(-50%);
@@ -761,7 +780,7 @@
         }
 
         .footer-hover-area {
-            position: fixed;
+            position: absolute;
             bottom: -220px;
             left: 50%;
             transform: translateX(-50%);
@@ -1030,9 +1049,9 @@
     </div>
 
     <!-- 页脚 -->
-    <div class="footer-hover-area"></div>
-    <img src="/static/footer-png2.png" alt="Footer Bottom" class="footer-image-bottom">
     <footer>
+        <div class="footer-hover-area"></div>
+        <img src="/static/footer-png2.png" alt="Footer Bottom" class="footer-image-bottom">
         <div class="footer-content">
             <img src="/static/footer-png1.png" alt="Footer" class="footer-image">
             <div class="footer-links">
