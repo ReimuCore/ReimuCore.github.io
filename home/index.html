@@ -1014,7 +1014,6 @@
                     <div class="stat-value" id="likeCount">加载中...</div>
                 </div>
             </div>
-            <div class="last-update" id="lastUpdate"></div>
         </div>
     </main>
     
@@ -1171,13 +1170,12 @@
 
         // 用户统计信息更新
         const USER_MID = '3493274442533075';
-        // 使用 Cloudflare Workers API（解决跨域问题）
-        const API_BASE_URL = 'https://quiet-dew-d623.484540891.workers.dev';
+        // 使用新的数据 API
+        const API_BASE_URL = 'https://dataapi.kabikingu.com';
         const UPDATE_INTERVAL = 1000; // 1秒
 
         const followerCountEl = document.getElementById('followerCount');
         const likeCountEl = document.getElementById('likeCount');
-        const lastUpdateEl = document.getElementById('lastUpdate');
 
         // 保存当前值，用于动画比较
         let currentFollower = null;
@@ -1358,7 +1356,6 @@
                     console.error('获取用户卡片信息失败:', data.error);
                     followerCountEl.textContent = `错误: ${data.error}`;
                     likeCountEl.textContent = `错误: ${data.error}`;
-                    lastUpdateEl.textContent = `错误: ${data.error}`;
                     return;
                 }
 
@@ -1394,7 +1391,6 @@
 
                 // 更新最后更新时间
                 const now = new Date();
-                lastUpdateEl.textContent = `最后更新: ${formatTime(now)}`;
             } catch (error) {
                 console.error('请求失败:', error);
                 followerCountEl.textContent = '请求失败';
