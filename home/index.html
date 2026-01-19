@@ -677,6 +677,18 @@
             pointer-events: none;
         }
 
+        footer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: -250px;
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(8px);
+            z-index: 1;
+            pointer-events: none;
+        }
 
         .footer-content {
             max-width: 1200px;
@@ -732,6 +744,10 @@
             opacity: 1;
             transition: opacity 0.3s ease;
             z-index: 2;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         .footer-image:hover {
@@ -752,6 +768,10 @@
             pointer-events: none;
             cursor: pointer;
             animation: slideUpFadeIn 1s ease-out 0s both;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         .footer-image-bottom::before {
@@ -764,6 +784,7 @@
             border: 2px solid rgba(255, 255, 255, 0.8);
             border-radius: 10px;
             background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
             z-index: 3;
             pointer-events: auto;
             cursor: pointer;
@@ -1191,7 +1212,7 @@
         const USER_MID = '3493274442533075';
         // 使用新的数据 API
         const API_BASE_URL = 'https://dataapi.kabikingu.com';
-        const UPDATE_INTERVAL = 1000; // 1秒
+        const UPDATE_INTERVAL = 5000; // 5秒
 
         const followerCountEl = document.getElementById('followerCount');
         const likeCountEl = document.getElementById('likeCount');
