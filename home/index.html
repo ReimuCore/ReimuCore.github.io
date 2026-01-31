@@ -504,35 +504,48 @@
         /* 网页嵌入模块 */
         /* 投稿和选择器容器 */
         .posts-picker-container {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 50%;
+            max-width: 50vw;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 2rem;
-            width: 100%;
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 2rem;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            min-height: 100vh;
+            padding: 2rem;
             box-sizing: border-box;
+            overflow-x: hidden;
+            overflow-y: visible;
+            z-index: 101;
         }
 
         /* 选择器组 */
         .pickers-group {
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
             align-items: center;
             flex-shrink: 0;
+            min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
         }
 
         /* 年份选择器 */
         .year-picker {
             position: relative;
-            width: 100px;
+            width: 60px;
+            min-width: 60px;
+            max-width: 60px;
             height: 60vh;
             max-height: 500px;
             background: transparent;
             padding: 0;
             z-index: 60;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         .year-picker-container {
@@ -590,13 +603,16 @@
         /* 月份选择器 */
         .month-picker {
             position: relative;
-            width: 100px;
+            width: 60px;
+            min-width: 60px;
+            max-width: 60px;
             height: 60vh;
             max-height: 500px;
             background: transparent;
             padding: 0;
             z-index: 60;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         .month-picker-container {
@@ -657,47 +673,46 @@
 
         /* 投稿展示区域 */
         .posts-display {
-            width: 500px;
-            height: 60vh;
-            max-height: 500px;
+            position: relative;
+            width: 400px;
+            max-width: 100%;
+            height: 100%;
+            min-height: 100vh;
             background: transparent;
-            padding: 2rem;
+            padding: 0;
             display: flex;
             flex-direction: column;
             animation: fadeIn 1s ease-out 0.7s both;
             flex-shrink: 1;
             min-width: 0;
             box-sizing: border-box;
+            overflow: hidden;
         }
 
-        .posts-display-header {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .posts-display-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 0.5rem;
-        }
-
-        .posts-display-date {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
 
         .posts-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 1rem;
             opacity: 1;
             transition: opacity 0.3s ease;
             visibility: visible;
             overflow-y: auto;
+            overflow-x: hidden;
             flex: 1;
             min-height: 0;
+            padding: 150px 2rem 250px;
+            -webkit-overflow-scrolling: touch; /* iOS 滚动惯性 */
+            scroll-behavior: smooth;
+            overscroll-behavior: contain; /* 防止滚动链 */
+            /* 隐藏滚动条 */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        /* 隐藏 WebKit 浏览器的滚动条 */
+        .posts-list::-webkit-scrollbar {
+            display: none;
         }
 
         .post-item {
@@ -707,29 +722,92 @@
             padding: 0;
             transition: all 0.3s ease;
             cursor: pointer;
-            aspect-ratio: 4 / 3;
+            aspect-ratio: 16 / 9;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            display: block;
             position: relative;
+            text-decoration: none;
+            color: inherit;
+            width: 100%;
+            flex-shrink: 0;
         }
 
-        .post-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        .post-item.selected {
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            transform: scale(1.02);
+        }
+
+        /* 选中投稿的hover效果：变暗并显示信息 */
+        .post-item.selected:hover {
+            filter: brightness(0.6);
+        }
+
+        .post-item.selected:hover .post-item-info-overlay {
+            opacity: 1;
+        }
+
+        /* 信息遮罩层 */
+        .post-item-info-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .post-item-info-title {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+            word-break: break-word;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .post-item-info-date {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .post-item-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: rgba(0, 0, 0, 0.3);
+            display: block;
         }
 
         .post-item-title {
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: bold;
             color: #fff;
-            padding: 0.8rem 1rem 0.4rem;
+            padding: 0.6rem 0.8rem;
             margin: 0;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            flex: 1;
+            display: flex;
+            align-items: center;
         }
 
         .post-item-content {
@@ -883,7 +961,7 @@
             max-width: 1200px;
             width: auto;
             height: auto;
-            opacity: 0;
+            opacity: 1;
             transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease;
             z-index: 0;
             pointer-events: none;
@@ -954,7 +1032,7 @@
             }
             to {
                 bottom: -200px;
-                opacity: 0.9;
+                opacity: 1;
             }
         }
 
@@ -971,14 +1049,35 @@
         }
 
         /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .posts-picker-container {
+                left: 50%;
+                max-width: 50vw;
+                padding: 0 1.5rem;
+                gap: 1.5rem;
+            }
+            
+            .posts-display {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .pickers-group {
+                max-width: 100%;
+                flex-wrap: nowrap;
+            }
+        }
+
         @media (max-width: 768px) {
             header {
                 padding: 0.8rem 1rem;
+                padding-left: 3.5rem;
             }
 
             nav {
                 flex-direction: row;
-                gap: 1rem;
+                gap: 0.5rem;
+                flex-wrap: wrap;
             }
 
             .sidebar {
@@ -993,32 +1092,125 @@
             }
 
             .nav-links {
-                gap: 0.8rem;
+                gap: 0.5rem;
                 flex-wrap: wrap;
-                justify-content: center;
+                justify-content: flex-end;
             }
 
             .nav-links a {
-                padding: 0.4rem 1rem;
-                font-size: 0.9rem;
+                padding: 0.4rem 0.8rem;
+                font-size: 0.85rem;
             }
 
             main {
-                margin-top: 90px;
+                margin-top: 80px;
                 padding: 1rem;
                 flex-direction: column;
+                gap: 1.5rem;
+                align-items: center;
             }
             
             #userStatsCard {
-                flex: 1 1 100%;
+                flex: 0 0 auto;
+                width: 100%;
                 max-width: 100%;
+                min-height: auto;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .stats-container {
+                gap: 1.5rem;
+                padding: 1rem 0;
+                width: 100%;
+                max-width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .stat-item {
+                padding: 1.5rem 1rem;
+            }
+
+            .stat-label {
+                font-size: 1.2rem;
+                margin-bottom: 0.8rem;
+            }
+
+            .stat-value {
+                font-size: 2.5rem;
+            }
+
+            .posts-picker-container {
+                position: fixed;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1rem;
+                gap: 1.5rem;
+                width: 100%;
+                max-width: 100%;
+                order: 2;
             }
             
+            #userStatsCard {
+                order: 1;
+            }
+
+            .pickers-group {
+                width: 100%;
+                max-width: 100%;
+                justify-content: center;
+                gap: 1rem;
+                flex-wrap: nowrap;
+                overflow-x: hidden;
+            }
+
+            .year-picker,
+            .month-picker {
+                width: 80px;
+                min-width: 80px;
+                max-width: 80px;
+                height: 50vh;
+                max-height: 400px;
+                flex-shrink: 0;
+            }
+
+            .posts-display {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                min-height: 50vh;
+                padding: 0;
+                overflow: hidden;
+            }
+            
+            .posts-list {
+                padding: 120px 1.5rem 200px;
+            }
+
+            .posts-display-title {
+                font-size: 1.3rem;
+            }
+
+            .posts-display-date {
+                font-size: 0.9rem;
+            }
+
+            .posts-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0.8rem;
+            }
 
             .top-link {
-                top: 100px;
-                right: 15px;
-                font-size: 0.8rem;
+                top: 90px;
+                right: 10px;
+                font-size: 0.75rem;
             }
 
             h1 {
@@ -1028,19 +1220,40 @@
             h2 {
                 font-size: 1.5rem;
             }
+
+            footer {
+                padding: 1.5rem 1rem;
+            }
+
+            .footer-image {
+                max-width: 200px;
+            }
+
+            .footer-image-bottom {
+                max-width: 100%;
+                left: 50%;
+            }
         }
 
         @media (max-width: 480px) {
             header {
                 padding: 0.6rem 0.8rem;
+                padding-left: 3rem;
             }
 
             .logo {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
+            }
+
+            .sidebar-toggle {
+                left: 0.5rem;
+                width: 36px;
+                height: 36px;
             }
 
             .sidebar {
                 width: 100%;
+                left: -100%;
                 top: 60px;
                 height: calc(100vh - 60px);
             }
@@ -1051,96 +1264,307 @@
             }
 
             nav {
-                gap: 0.8rem;
-            }
-
-            .nav-links {
                 gap: 0.5rem;
             }
 
+            .nav-links {
+                gap: 0.4rem;
+                font-size: 0;
+            }
+
             .nav-links a {
-                padding: 0.3rem 0.8rem;
-                font-size: 0.85rem;
+                padding: 0.3rem 0.6rem;
+                font-size: 0.8rem;
             }
 
             main {
-                margin-top: 100px;
-                padding: 1rem;
+                margin-top: 70px;
+                padding: 0.8rem;
                 flex-direction: column;
+                gap: 1rem;
+                align-items: center;
             }
             
             #userStatsCard {
-                flex: 1 1 100%;
+                flex: 0 0 auto;
+                width: 100%;
                 max-width: 100%;
+                min-height: auto;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .stats-container {
+                gap: 1rem;
+                padding: 0.5rem 0;
+                width: 100%;
+                max-width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .stat-item {
+                padding: 1rem 0.8rem;
+            }
+
+            .stat-label {
+                font-size: 1rem;
+                margin-bottom: 0.6rem;
+            }
+
+            .stat-value {
+                font-size: 2rem;
             }
 
             .posts-picker-container {
                 flex-direction: column;
-                align-items: center;
-                padding: 1rem;
-                gap: 1.5rem;
-                max-width: 100%;
-                margin: 1rem auto;
-                box-sizing: border-box;
-            }
-
-            .posts-display {
+                align-items: stretch;
+                padding: 0.8rem;
+                gap: 1rem;
                 width: 100%;
                 max-width: 100%;
-                height: 400px;
-                margin: 0;
-                box-sizing: border-box;
+                order: 2;
             }
-
-            .posts-list {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 0.8rem;
-            }
-
-            .post-item-title {
-                font-size: 0.9rem;
-                padding: 0.6rem 0.8rem 0.3rem;
-            }
-
-            .post-item-content {
-                font-size: 0.8rem;
-                padding: 0 0.8rem 0.8rem;
+            
+            #userStatsCard {
+                order: 1;
             }
 
             .pickers-group {
                 width: 100%;
                 max-width: 100%;
                 justify-content: center;
-                flex-wrap: wrap;
+                gap: 0.8rem;
                 box-sizing: border-box;
-                padding: 0 0.5rem;
+                padding: 0;
+                overflow-x: hidden;
             }
 
             .year-picker,
             .month-picker {
-                height: 300px;
-                max-height: 300px;
+                width: 70px;
+                min-width: 70px;
+                max-width: 70px;
+                height: 40vh;
+                max-height: 280px;
+                min-height: 200px;
                 flex-shrink: 0;
             }
+
+            .posts-display {
+                position: relative;
+                width: 100%;
+                max-width: 100%;
+                height: 100%;
+                min-height: 40vh;
+                padding: 0;
+                margin: 0;
+                box-sizing: border-box;
+                overflow: hidden;
+            }
             
-            .top-link {
-                top: 110px;
-                right: 10px;
-                font-size: 0.75rem;
-                padding: 0.4rem 0.8rem;
+            .posts-list {
+                padding: 100px 1rem 180px;
             }
 
-            footer {
-                padding: 1.5rem 1rem;
-            }
 
-            .footer-links {
-                gap: 0.8rem;
+            .posts-display-date {
                 font-size: 0.85rem;
             }
 
-            .footer-copyright {
+            .posts-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0.6rem;
+            }
+
+            .post-item {
+                border-radius: 8px;
+            }
+
+            .post-item-title {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.6rem 0.3rem;
+            }
+
+            .post-item-content {
                 font-size: 0.75rem;
+                padding: 0 0.6rem 0.6rem;
+                -webkit-line-clamp: 2;
+                line-clamp: 2;
+            }
+            
+            .top-link {
+                top: 80px;
+                right: 8px;
+                font-size: 0.7rem;
+                padding: 0.3rem 0.6rem;
+            }
+
+            footer {
+                padding: 1rem 0.8rem;
+            }
+
+            .footer-content {
+                gap: 0.6rem;
+            }
+
+            .footer-image {
+                max-width: 150px;
+                top: -40px;
+            }
+
+            .footer-image-bottom {
+                max-width: 95%;
+                bottom: -150px;
+            }
+
+            .footer-hover-area {
+                bottom: -170px;
+                width: 200px;
+                height: 500px;
+            }
+
+            .footer-links {
+                gap: 0.6rem;
+                font-size: 0.8rem;
+                flex-wrap: wrap;
+            }
+
+            .footer-copyright {
+                font-size: 0.7rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* 超小屏幕设备 (< 360px) */
+        @media (max-width: 360px) {
+            header {
+                padding: 0.5rem 0.6rem;
+                padding-left: 2.5rem;
+            }
+
+            .logo {
+                font-size: 1rem;
+            }
+
+            .sidebar-toggle {
+                width: 32px;
+                height: 32px;
+            }
+
+            .nav-links a {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
+            }
+
+            main {
+                padding: 0.6rem;
+            }
+
+            .stat-label {
+                font-size: 0.9rem;
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+            }
+
+            .year-picker,
+            .month-picker {
+                width: 60px;
+                height: 35vh;
+                max-height: 250px;
+            }
+
+            .posts-display {
+                padding: 0.8rem;
+            }
+
+            .posts-display-title {
+                font-size: 1rem;
+            }
+
+            .posts-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .footer-image {
+                max-width: 120px;
+            }
+        }
+
+        /* 触摸设备优化 */
+        @media (hover: none) and (pointer: coarse) {
+            .nav-links a {
+                padding: 0.5rem 1rem;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+            }
+
+            .sidebar-toggle {
+                min-width: 44px;
+                min-height: 44px;
+            }
+
+            .post-item {
+                min-height: 120px;
+            }
+
+            /* 禁用hover效果，改用active */
+            .nav-links a:hover {
+                background: rgba(255, 255, 255, 0.1);
+                transform: none;
+            }
+
+            .nav-links a:active {
+                background: rgba(255, 255, 255, 0.2);
+                transform: scale(0.98);
+            }
+
+            .post-item:hover {
+                transform: none;
+            }
+
+            .post-item:active {
+                transform: scale(0.98);
+                background: rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        /* 防止横向滚动 */
+        html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
+        * {
+            max-width: 100%;
+        }
+
+        /* 移动端优化滚动 */
+        @media (max-width: 768px) {
+            .posts-list {
+                -webkit-overflow-scrolling: touch;
+                scroll-behavior: smooth;
+            }
+
+            .year-picker-list,
+            .month-picker-list {
+                -webkit-overflow-scrolling: touch;
             }
         }
     </style>
@@ -1206,10 +1630,6 @@
         <div class="posts-picker-container">
             <!-- 投稿展示区域 -->
             <div class="posts-display" id="postsDisplay">
-                <div class="posts-display-header">
-                    <div class="posts-display-title">投稿内容</div>
-                    <div class="posts-display-date" id="postsDisplayDate">请选择年月</div>
-                </div>
                 <div class="posts-list" id="postsList">
                 </div>
             </div>
@@ -1256,12 +1676,16 @@
     </footer>
 
     <script>
-        // 侧边栏控制 - 鼠标悬停展开
+        // 全局常量
+        const USER_MID = '3493274442533075';
+        
+        // 侧边栏控制 - 支持鼠标悬停和触摸点击
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
 
         let hoverTimeout;
+        let isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
         function openSidebar() {
             clearTimeout(hoverTimeout);
@@ -1278,23 +1702,47 @@
             }, 200); // 200ms延迟，避免鼠标快速移动时闪烁
         }
 
-        // 鼠标悬停在按钮上时打开
-        sidebarToggle.addEventListener('mouseenter', openSidebar);
-        sidebarToggle.addEventListener('mouseleave', closeSidebar);
+        // 触摸设备：使用点击事件
+        if (isTouchDevice) {
+            let isOpen = false;
+            
+            sidebarToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                isOpen = !isOpen;
+                if (isOpen) {
+                    openSidebar();
+                } else {
+                    closeSidebar();
+                }
+            });
 
-        // 鼠标悬停在侧边栏上时保持打开
-        sidebar.addEventListener('mouseenter', () => {
-            clearTimeout(hoverTimeout);
-            sidebar.classList.add('open');
-            sidebarToggle.classList.add('active');
-            sidebarOverlay.classList.add('active');
-        });
+            sidebarOverlay.addEventListener('click', () => {
+                isOpen = false;
+                closeSidebar();
+            });
 
-        // 鼠标离开侧边栏时关闭
-        sidebar.addEventListener('mouseleave', closeSidebar);
+            // 点击侧边栏外部区域关闭
+            document.addEventListener('click', (e) => {
+                if (isOpen && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    isOpen = false;
+                    closeSidebar();
+                }
+            });
+        } else {
+            // 非触摸设备：使用悬停事件
+            sidebarToggle.addEventListener('mouseenter', openSidebar);
+            sidebarToggle.addEventListener('mouseleave', closeSidebar);
 
-        // 鼠标离开遮罩层时关闭
-        sidebarOverlay.addEventListener('mouseleave', closeSidebar);
+            sidebar.addEventListener('mouseenter', () => {
+                clearTimeout(hoverTimeout);
+                sidebar.classList.add('open');
+                sidebarToggle.classList.add('active');
+                sidebarOverlay.classList.add('active');
+            });
+
+            sidebar.addEventListener('mouseleave', closeSidebar);
+            sidebarOverlay.addEventListener('mouseleave', closeSidebar);
+        }
         // 创建背景粒子效果
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
@@ -1540,46 +1988,27 @@
                 });
             });
             
-            // 第一步：基础移动 - 每次滚轮滚动，列表通过transform向下移动一个单位距离
-            container.addEventListener('wheel', (e) => {
-                e.preventDefault(); // 阻止默认滚动行为
-                
+            // 移动选择器的通用函数
+            function movePicker(direction) {
                 const height = getItemHeight();
-                if (height === 0) return; // 如果高度还没计算好，不执行
+                if (height === 0) return;
                 
-                // 获取移动范围
                 const range = getTranslateYRange();
-                
-                // 判断滚动方向：向下滚动（deltaY > 0）时，列表向上移动（translateY减少）
-                const direction = e.deltaY > 0 ? -1 : 1;
-                
-                // 计算新的translateY值：当前值 + 一个项目的高度
                 let newTranslateY = currentTranslateY + (direction * height);
-                
-                // 限制在有效范围内
-                // 注意：由于maxTranslateY < minTranslateY（因为向下移动时translateY增加）
-                // 所以需要确保 newTranslateY 在 [maxTranslateY, minTranslateY] 范围内
                 newTranslateY = Math.max(range.max, Math.min(range.min, newTranslateY));
                 
-                // 更新translateY值
                 currentTranslateY = newTranslateY;
-                
-                // 使用transform移动列表（CSS transition会自动应用动画）
                 list.style.transform = `translateY(${currentTranslateY}px)`;
                 
-                // 立即更新选中状态和透明度（实时响应，不等待动画）
                 const selectedIndex = updateSelectedYear();
                 const selectedYear = years[selectedIndex];
                 
-                // 只有当年份索引真正改变时才更新月份选择器（避免边界时的闪烁）
                 if (selectedIndex !== lastSelectedYearIndex && typeof window.updateMonthPicker === 'function') {
                     window.updateMonthPicker(selectedYear);
                     lastSelectedYearIndex = selectedIndex;
                 }
                 
-                // 更新投稿展示区域
                 if (typeof window.updatePostsDisplay === 'function') {
-                    // 获取当前选中的月份
                     const monthPickerList = document.getElementById('monthPickerList');
                     const selectedMonthItem = monthPickerList ? monthPickerList.querySelector('.month-picker-item.selected') : null;
                     let selectedMonth = null;
@@ -1590,45 +2019,73 @@
                     window.updatePostsDisplay(selectedYear, selectedMonth);
                 }
                 
-                // 在动画过程中持续更新选中状态和透明度（使用requestAnimationFrame）
-                let animationFrameId = null;
-                const startTime = performance.now();
-                const duration = 300; // 动画持续时间
-                
-                function updateDuringAnimation(currentTime) {
-                    const elapsed = currentTime - startTime;
-                    
-                    if (elapsed < duration) {
-                        // 在动画过程中实时更新选中状态和透明度
-                        const currentIndex = updateSelectedYear();
-                        const currentYear = years[currentIndex];
-                        
-                        // 实时更新投稿展示
-                        if (typeof window.updatePostsDisplay === 'function') {
-                            const monthPickerList = document.getElementById('monthPickerList');
-                            const selectedMonthItem = monthPickerList ? monthPickerList.querySelector('.month-picker-item.selected') : null;
-                            let selectedMonth = null;
-                            if (selectedMonthItem) {
-                                const monthText = selectedMonthItem.textContent;
-                                selectedMonth = parseInt(monthText.replace('月', ''));
-                            }
-                            window.updatePostsDisplay(currentYear, selectedMonth);
-                        }
-                        
-                        animationFrameId = requestAnimationFrame(updateDuringAnimation);
-                    } else {
-                        // 动画完成后精确对齐
-                        const finalIndex = updateSelectedYear();
-                        adjustPositionForSelectedIndex(finalIndex);
-                    }
-                }
-                
-                // 清除之前的动画帧
-                if (animationFrameId) {
-                    cancelAnimationFrame(animationFrameId);
-                }
-                animationFrameId = requestAnimationFrame(updateDuringAnimation);
+                const finalIndex = updateSelectedYear();
+                adjustPositionForSelectedIndex(finalIndex);
+            }
+
+            // 滚轮事件
+            container.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const direction = e.deltaY > 0 ? -1 : 1;
+                movePicker(direction);
             }, { passive: false });
+
+            // 触摸滑动支持
+            let touchStartY = 0;
+            let touchStartTranslateY = 0;
+            let isTouching = false;
+
+            container.addEventListener('touchstart', (e) => {
+                isTouching = true;
+                touchStartY = e.touches[0].clientY;
+                touchStartTranslateY = currentTranslateY;
+                list.style.transition = 'none'; // 禁用过渡，实现流畅滑动
+            }, { passive: true });
+
+            container.addEventListener('touchmove', (e) => {
+                if (!isTouching) return;
+                e.preventDefault();
+                
+                const touchY = e.touches[0].clientY;
+                const deltaY = touchY - touchStartY;
+                const range = getTranslateYRange();
+                
+                let newTranslateY = touchStartTranslateY + deltaY;
+                newTranslateY = Math.max(range.max, Math.min(range.min, newTranslateY));
+                
+                currentTranslateY = newTranslateY;
+                list.style.transform = `translateY(${currentTranslateY}px)`;
+                
+                updateSelectedYear();
+            }, { passive: false });
+
+            container.addEventListener('touchend', (e) => {
+                if (!isTouching) return;
+                isTouching = false;
+                
+                // 恢复过渡动画
+                list.style.transition = '';
+                
+                // 对齐到最近的选项
+                const finalIndex = updateSelectedYear();
+                adjustPositionForSelectedIndex(finalIndex);
+                
+                // 更新月份和投稿
+                const selectedYear = years[finalIndex];
+                if (typeof window.updateMonthPicker === 'function') {
+                    window.updateMonthPicker(selectedYear);
+                }
+                if (typeof window.updatePostsDisplay === 'function') {
+                    const monthPickerList = document.getElementById('monthPickerList');
+                    const selectedMonthItem = monthPickerList ? monthPickerList.querySelector('.month-picker-item.selected') : null;
+                    let selectedMonth = null;
+                    if (selectedMonthItem) {
+                        const monthText = selectedMonthItem.textContent;
+                        selectedMonth = parseInt(monthText.replace('月', ''));
+                    }
+                    window.updatePostsDisplay(selectedYear, selectedMonth);
+                }
+            }, { passive: true });
         }
         
         // 页面加载完成后初始化年份选择器
@@ -1860,86 +2317,98 @@
                 });
             });
             
-            // 滚轮事件
-            container.addEventListener('wheel', (e) => {
-                e.preventDefault();
-                
+            // 移动月份选择器的通用函数
+            function moveMonthPicker(direction) {
                 const height = getItemHeight();
                 if (height === 0) return;
                 
                 const range = getTranslateYRange();
-                const direction = e.deltaY > 0 ? -1 : 1;
-                
                 let newTranslateY = currentTranslateY + (direction * height);
                 newTranslateY = Math.max(range.max, Math.min(range.min, newTranslateY));
                 
                 currentTranslateY = newTranslateY;
-                // 使用transform移动列表（CSS transition会自动应用动画）
                 list.style.transform = `translateY(${currentTranslateY}px)`;
                 
-                // 立即更新选中状态和透明度（实时响应，不等待动画）
                 const selectedIndex = updateSelectedMonth();
                 lastSelectedMonthIndex = selectedIndex;
                 
-                // 更新投稿展示区域
                 if (typeof window.updatePostsDisplay === 'function') {
-                    // 获取当前选中的年份
                     const yearPickerList = document.getElementById('yearPickerList');
                     const selectedYearItem = yearPickerList ? yearPickerList.querySelector('.year-picker-item.selected') : null;
                     let selectedYear = null;
                     if (selectedYearItem) {
                         selectedYear = parseInt(selectedYearItem.textContent);
                     }
-                    
-                    // 获取当前选中的月份
                     const selectedMonth = months[selectedIndex] ? months[selectedIndex].value : null;
                     window.updatePostsDisplay(selectedYear, selectedMonth);
                 }
                 
-                // 在动画过程中持续更新选中状态和透明度（使用requestAnimationFrame）
-                let animationFrameId = null;
-                const startTime = performance.now();
-                const duration = 300; // 动画持续时间
-                
-                function updateDuringAnimation(currentTime) {
-                    const elapsed = currentTime - startTime;
-                    
-                    if (elapsed < duration) {
-                        // 在动画过程中实时更新选中状态和透明度
-                        const currentIndex = updateSelectedMonth();
-                        const currentMonth = months[currentIndex] ? months[currentIndex].value : null;
-                        
-                        // 实时更新投稿展示
-                        if (typeof window.updatePostsDisplay === 'function') {
-                            const yearPickerList = document.getElementById('yearPickerList');
-                            const selectedYearItem = yearPickerList ? yearPickerList.querySelector('.year-picker-item.selected') : null;
-                            let selectedYear = null;
-                            if (selectedYearItem) {
-                                selectedYear = parseInt(selectedYearItem.textContent);
-                            }
-                            window.updatePostsDisplay(selectedYear, currentMonth);
-                        }
-                        
-                        animationFrameId = requestAnimationFrame(updateDuringAnimation);
-                    } else {
-                        // 动画完成后精确对齐
-                        const finalIndex = updateSelectedMonth();
-                        adjustPositionForSelectedIndex(finalIndex);
-                    }
-                }
-                
-                // 清除之前的动画帧
-                if (animationFrameId) {
-                    cancelAnimationFrame(animationFrameId);
-                }
-                animationFrameId = requestAnimationFrame(updateDuringAnimation);
+                const finalIndex = updateSelectedMonth();
+                adjustPositionForSelectedIndex(finalIndex);
+            }
+
+            // 滚轮事件
+            container.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const direction = e.deltaY > 0 ? -1 : 1;
+                moveMonthPicker(direction);
             }, { passive: false });
+
+            // 触摸滑动支持
+            let monthTouchStartY = 0;
+            let monthTouchStartTranslateY = 0;
+            let isMonthTouching = false;
+
+            container.addEventListener('touchstart', (e) => {
+                isMonthTouching = true;
+                monthTouchStartY = e.touches[0].clientY;
+                monthTouchStartTranslateY = currentTranslateY;
+                list.style.transition = 'none';
+            }, { passive: true });
+
+            container.addEventListener('touchmove', (e) => {
+                if (!isMonthTouching) return;
+                e.preventDefault();
+                
+                const touchY = e.touches[0].clientY;
+                const deltaY = touchY - monthTouchStartY;
+                const range = getTranslateYRange();
+                
+                let newTranslateY = monthTouchStartTranslateY + deltaY;
+                newTranslateY = Math.max(range.max, Math.min(range.min, newTranslateY));
+                
+                currentTranslateY = newTranslateY;
+                list.style.transform = `translateY(${currentTranslateY}px)`;
+                
+                updateSelectedMonth();
+            }, { passive: false });
+
+            container.addEventListener('touchend', (e) => {
+                if (!isMonthTouching) return;
+                isMonthTouching = false;
+                
+                list.style.transition = '';
+                
+                const finalIndex = updateSelectedMonth();
+                adjustPositionForSelectedIndex(finalIndex);
+                
+                if (typeof window.updatePostsDisplay === 'function') {
+                    const yearPickerList = document.getElementById('yearPickerList');
+                    const selectedYearItem = yearPickerList ? yearPickerList.querySelector('.year-picker-item.selected') : null;
+                    let selectedYear = null;
+                    if (selectedYearItem) {
+                        selectedYear = parseInt(selectedYearItem.textContent);
+                    }
+                    const selectedMonth = months[finalIndex] ? months[finalIndex].value : null;
+                    window.updatePostsDisplay(selectedYear, selectedMonth);
+                }
+            }, { passive: true });
             
             // 监听年份变化，更新月份列表
-            function updateMonthsForYear(year) {
-                // 保存当前选中的月份值（如果存在）
-                let targetMonthValue = null;
-                if (lastSelectedMonthIndex >= 0 && lastSelectedMonthIndex < months.length) {
+            function updateMonthsForYear(year, targetMonth = null) {
+                // 如果提供了目标月份，使用它；否则保存当前选中的月份值（如果存在）
+                let targetMonthValue = targetMonth;
+                if (targetMonthValue === null && lastSelectedMonthIndex >= 0 && lastSelectedMonthIndex < months.length) {
                     targetMonthValue = months[lastSelectedMonthIndex].value;
                 }
                 
@@ -1977,18 +2446,14 @@
                 itemHeight = 0; // 重置高度，需要重新计算
                 lastSelectedMonthIndex = targetIndex; // 设置目标索引
                 
-                // 临时禁用动画，切换年份时立即定位
-                const originalTransition = list.style.transition;
-                list.style.transition = 'none';
-                
+                // 使用平滑滚动，而不是立即定位
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
-                        // 调整位置到目标月份（无动画）
+                        // 调整位置到目标月份（使用平滑滚动）
                         adjustPositionForSelectedIndex(targetIndex);
                         
-                        // 恢复动画并显示列表（使用requestAnimationFrame确保透明度更新完成）
+                        // 显示列表（使用requestAnimationFrame确保透明度更新完成）
                         requestAnimationFrame(() => {
-                            list.style.transition = originalTransition || '';
                             list.style.opacity = '1';
                             
                             // 更新投稿展示区域
@@ -2009,84 +2474,784 @@
         window.addEventListener('load', initMonthPicker);
 
         // 投稿展示区域初始化
+        // 注意：USER_MID 在后面的用户统计信息更新部分声明，这里先检查是否存在
         let postsData = {};
         let updatePostsDisplay = null;
+        const VIDEOS_API_URL = 'https://quiet-dew-d623.484540891.workers.dev/videos';
+        
+        // 从API获取视频数据并分类到年月
+        async function fetchAndOrganizeVideos() {
+            try {
+                const response = await fetch(`${VIDEOS_API_URL}?mid=${USER_MID}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP错误: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.videos || !Array.isArray(data.videos)) {
+                    console.warn('API返回数据格式不正确');
+                    return;
+                }
+                
+                // 清空现有数据
+                postsData = {};
+                
+                // 处理每个视频，根据时间戳分类到年月
+                data.videos.forEach(video => {
+                    const pubDate = new Date(video.pubdate * 1000); // 时间戳转日期
+                    const year = pubDate.getFullYear();
+                    const month = pubDate.getMonth() + 1; // getMonth() 返回 0-11
+                    
+                    console.log(`处理视频 ${video.bvid}:`, {
+                        pubdate: video.pubdate,
+                        date: pubDate.toISOString(),
+                        year,
+                        month
+                    });
+                    
+                    // 初始化年份对象
+                    if (!postsData[year]) {
+                        postsData[year] = {};
+                    }
+                    
+                    // 初始化月份数组
+                    if (!postsData[year][month]) {
+                        postsData[year][month] = [];
+                    }
+                    
+                    // 直接使用API返回的cover URL（修复双https问题）
+                    let coverUrl = video.cover || '';
+                    // 修复双https://的问题
+                    if (coverUrl && coverUrl.includes('https://https://')) {
+                        coverUrl = coverUrl.replace('https://https://', 'https://');
+                    }
+                    
+                    // 添加视频数据
+                    postsData[year][month].push({
+                        bvid: video.bvid,
+                        title: video.title,
+                        cover: coverUrl,
+                        pubdate: video.pubdate
+                    });
+                });
+                
+                // 对每个月的视频按发布时间排序（从新到旧）
+                Object.keys(postsData).forEach(year => {
+                    Object.keys(postsData[year]).forEach(month => {
+                        postsData[year][month].sort((a, b) => b.pubdate - a.pubdate);
+                    });
+                });
+                
+                console.log('视频数据加载完成', postsData);
+                
+                // 数据加载完成后，渲染所有投稿
+                if (typeof window.updatePostsDisplay === 'function') {
+                    const yearPickerList = document.getElementById('yearPickerList');
+                    const monthPickerList = document.getElementById('monthPickerList');
+                    const selectedYearItem = yearPickerList ? yearPickerList.querySelector('.year-picker-item.selected') : null;
+                    const selectedMonthItem = monthPickerList ? monthPickerList.querySelector('.month-picker-item.selected') : null;
+                    
+                    let selectedYear = null;
+                    let selectedMonth = null;
+                    if (selectedYearItem && selectedMonthItem) {
+                        selectedYear = parseInt(selectedYearItem.textContent);
+                        const monthText = selectedMonthItem.textContent;
+                        selectedMonth = parseInt(monthText.replace('月', ''));
+                    }
+                    
+                    // 无论是否有选中的年月，都渲染所有投稿
+                    // 初始化时不触发自动定位，而是等待初始化代码选择最新投稿
+                    window.updatePostsDisplay(selectedYear, selectedMonth, true);
+                }
+            } catch (error) {
+                console.error('获取视频数据失败:', error);
+                // 初始化空数据结构，避免后续错误
+                postsData = {};
+            }
+        }
         
         function initPostsDisplay() {
-            const postsDisplayDate = document.getElementById('postsDisplayDate');
             const postsList = document.getElementById('postsList');
             
-            // 生成示例数据：从2023年4月到当前年月
-            const now = new Date();
-            const currentYear = now.getFullYear();
-            const currentMonth = now.getMonth() + 1;
-            const startYear = 2023;
-            const startMonth = 4;
+            // 先获取视频数据
+            fetchAndOrganizeVideos();
             
-            for (let year = startYear; year <= currentYear; year++) {
-                postsData[year] = {};
-                let minMonth = 1;
-                let maxMonth = 12;
+            // 渲染所有投稿（按时间从旧到新排序）
+            function renderAllPosts() {
+                // 清空列表
+                postsList.innerHTML = '';
                 
-                if (year === startYear) minMonth = startMonth;
-                if (year === currentYear) maxMonth = currentMonth;
-                
-                for (let month = minMonth; month <= maxMonth; month++) {
-                    // 每个月生成2-3个示例投稿
-                    const postCount = 2 + Math.floor(Math.random() * 2); // 2或3个
-                    postsData[year][month] = [];
-                    
-                    for (let i = 1; i <= postCount; i++) {
-                        postsData[year][month].push({
-                            title: `${year}年${month}月内容${i}`,
-                            content: `这是${year}年${month}月的第${i}个投稿内容示例。`
+                // 收集所有投稿并按时间排序（从旧到新）
+                const allPosts = [];
+                Object.keys(postsData).sort((a, b) => parseInt(a) - parseInt(b)).forEach(year => {
+                    Object.keys(postsData[year]).sort((a, b) => parseInt(a) - parseInt(b)).forEach(month => {
+                        postsData[year][month].forEach(post => {
+                            // 添加年月信息，用于滚动定位
+                            allPosts.push({
+                                ...post,
+                                year: parseInt(year),
+                                month: parseInt(month)
+                            });
                         });
+                    });
+                });
+                
+                // 按发布时间从旧到新排序
+                allPosts.sort((a, b) => a.pubdate - b.pubdate);
+                
+                if (allPosts.length === 0) {
+                    postsList.innerHTML = '<div class="posts-empty">暂无投稿内容</div>';
+                    return;
+                }
+                
+                // 创建顶部占位元素（透明，无法选中）
+                const topSpacer = document.createElement('div');
+                topSpacer.className = 'post-item post-item-spacer';
+                topSpacer.style.opacity = '0';
+                topSpacer.style.pointerEvents = 'none';
+                topSpacer.style.visibility = 'hidden';
+                postsList.appendChild(topSpacer);
+                
+                // 渲染所有投稿
+                allPosts.forEach((post) => {
+                    const postItem = document.createElement('a');
+                    postItem.className = 'post-item';
+                    postItem.href = `https://www.bilibili.com/video/${post.bvid}`;
+                    postItem.target = '_blank';
+                    postItem.rel = 'noopener noreferrer';
+                    // 添加年月属性，用于滚动定位
+                    postItem.setAttribute('data-year', post.year);
+                    postItem.setAttribute('data-month', post.month);
+                    // 保存标题和发布日期，用于hover显示
+                    postItem.setAttribute('data-title', post.title || '');
+                    postItem.setAttribute('data-pubdate', post.pubdate || '');
+                    
+                    const img = document.createElement('img');
+                    img.src = post.cover || '';
+                    img.alt = post.title || '视频封面';
+                    img.className = 'post-item-cover';
+                    img.loading = 'lazy';
+                    
+                    // 创建信息遮罩层（用于hover时显示）
+                    const infoOverlay = document.createElement('div');
+                    infoOverlay.className = 'post-item-info-overlay';
+                    const titleDiv = document.createElement('div');
+                    titleDiv.className = 'post-item-info-title';
+                    titleDiv.textContent = post.title || '无标题';
+                    const dateDiv = document.createElement('div');
+                    dateDiv.className = 'post-item-info-date';
+                    if (post.pubdate) {
+                        const pubDate = new Date(post.pubdate * 1000);
+                        const year = pubDate.getFullYear();
+                        const month = String(pubDate.getMonth() + 1).padStart(2, '0');
+                        const day = String(pubDate.getDate()).padStart(2, '0');
+                        dateDiv.textContent = `${year}-${month}-${day}`;
                     }
+                    infoOverlay.appendChild(titleDiv);
+                    infoOverlay.appendChild(dateDiv);
+                    // 图片加载失败时的处理 - 显示实际的封面URL用于调试
+                    img.onerror = function() {
+                        console.warn('图片加载失败:', post.cover);
+                        this.style.display = 'none';
+                        this.parentElement.style.background = 'rgba(255, 255, 255, 0.05)';
+                        this.parentElement.style.display = 'flex';
+                        this.parentElement.style.alignItems = 'center';
+                        this.parentElement.style.justifyContent = 'center';
+                        this.parentElement.style.flexDirection = 'column';
+                        this.parentElement.style.padding = '1rem';
+                        this.parentElement.style.wordBreak = 'break-all';
+                        const errorText = document.createElement('div');
+                        errorText.textContent = post.cover || '封面URL为空';
+                        errorText.style.color = 'rgba(255, 255, 255, 0.7)';
+                        errorText.style.fontSize = '0.75rem';
+                        errorText.style.textAlign = 'center';
+                        errorText.style.lineHeight = '1.4';
+                        this.parentElement.appendChild(errorText);
+                    };
+                    
+                    postItem.appendChild(img);
+                    postItem.appendChild(infoOverlay);
+                    postsList.appendChild(postItem);
+                });
+                
+                // 创建底部占位元素（透明，无法选中）
+                const bottomSpacer = document.createElement('div');
+                bottomSpacer.className = 'post-item post-item-spacer';
+                bottomSpacer.style.opacity = '0';
+                bottomSpacer.style.pointerEvents = 'none';
+                bottomSpacer.style.visibility = 'hidden';
+                postsList.appendChild(bottomSpacer);
+                
+                // 渲染完成后，如果是初始化阶段，执行初始化滚动
+                if (isInitializing) {
+                    // 初始化：滚动到最新的投稿（最后一个）
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            const allPosts = postsList.querySelectorAll('.post-item:not(.post-item-spacer)');
+                            if (allPosts.length > 0) {
+                                const latestPost = allPosts[allPosts.length - 1];
+                                if (latestPost) {
+                                    // 先清除所有选中状态
+                                    postsList.querySelectorAll('.post-item').forEach(post => {
+                                        post.classList.remove('selected');
+                                    });
+                                    // 立即标记最后一个投稿为选中
+                                    latestPost.classList.add('selected');
+                                    
+                                    // 设置标志，避免触发自动定位
+                                    isUpdatingPickersFromScroll = true;
+                                    // 先滚动到底部
+                                    postsList.scrollTop = postsList.scrollHeight;
+                                    // 等待DOM更新后，滚动到最后一个投稿的中心位置
+                                    requestAnimationFrame(() => {
+                                        requestAnimationFrame(() => {
+                                            // 再次确保滚动到底部
+                                            postsList.scrollTop = postsList.scrollHeight;
+                                            requestAnimationFrame(() => {
+                                                // 传入skipUpdateSelected=true，避免updateSelectedPost覆盖选中状态
+                                                scrollPostToCenter(latestPost, true);
+                                                // 更新选择器为最新投稿的年月
+                                                setTimeout(() => {
+                                                    // 确保选中状态仍然是最后一个投稿
+                                                    const currentPosts = postsList.querySelectorAll('.post-item:not(.post-item-spacer)');
+                                                    if (currentPosts.length > 0) {
+                                                        const currentLatestPost = currentPosts[currentPosts.length - 1];
+                                                        postsList.querySelectorAll('.post-item').forEach(post => {
+                                                            post.classList.remove('selected');
+                                                        });
+                                                        if (currentLatestPost) {
+                                                            currentLatestPost.classList.add('selected');
+                                                            updatePickersFromPost(currentLatestPost);
+                                                        }
+                                                    }
+                                                    setTimeout(() => {
+                                                        isUpdatingPickersFromScroll = false;
+                                                        isInitializing = false; // 初始化完成
+                                                    }, 300);
+                                                }, 600); // 等待滚动动画完成
+                                            });
+                                        });
+                                    });
+                                }
+                            } else {
+                                isInitializing = false; // 初始化完成
+                            }
+                        });
+                    });
+                } else {
+                    // 非初始化阶段，更新选中状态（不自动滚动，等待用户操作或年月选择）
+                    requestAnimationFrame(() => {
+                        // 只更新选中状态，不自动滚动
+                        const centerPost = findCenterPost();
+                        if (centerPost) {
+                            postsList.querySelectorAll('.post-item').forEach(post => {
+                                post.classList.remove('selected');
+                            });
+                            centerPost.classList.add('selected');
+                        }
+                    });
+                }
+            }
+            
+            // 检测视口中心的投稿
+            function findCenterPost() {
+                const container = postsList;
+                const containerRect = container.getBoundingClientRect();
+                const centerY = containerRect.top + containerRect.height / 2;
+                
+                // 排除占位元素
+                const posts = container.querySelectorAll('.post-item:not(.post-item-spacer)');
+                let closestPost = null;
+                let minDistance = Infinity;
+                
+                posts.forEach(post => {
+                    const postRect = post.getBoundingClientRect();
+                    const postCenterY = postRect.top + postRect.height / 2;
+                    const distance = Math.abs(postCenterY - centerY);
+                    
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestPost = post;
+                    }
+                });
+                
+                return closestPost;
+            }
+            
+            // 用于存储滚动动画的ID，以便可以取消
+            let scrollAnimationId = null;
+            
+            // 缓动函数：ease-out-cubic，速度从大逐渐减小到0，提供自然的减速效果
+            function easeOutCubic(t) {
+                return 1 - Math.pow(1 - t, 3);
+            }
+            
+            // 滚动投稿到中心位置（使用缓动曲线，1000ms内完成）
+            function scrollPostToCenter(post, skipUpdateSelected = false) {
+                if (!post) return;
+                
+                // 停止任何正在进行的动画
+                if (scrollAnimationId) {
+                    cancelAnimationFrame(scrollAnimationId);
+                }
+                
+                isScrolling = true;
+                
+                const container = postsList;
+                const containerRect = container.getBoundingClientRect();
+                const postRect = post.getBoundingClientRect();
+                const containerCenterY = containerRect.top + containerRect.height / 2;
+                const postCenterY = postRect.top + postRect.height / 2;
+                
+                // 计算需要滚动的距离（让投稿中心对齐到容器中心）
+                const targetScrollTop = container.scrollTop + (postCenterY - containerCenterY);
+                const startScrollTop = container.scrollTop;
+                const distance = targetScrollTop - startScrollTop;
+                
+                // 如果距离太小，直接完成
+                if (Math.abs(distance) < 1) {
+                    isScrolling = false;
+                    if (!skipUpdateSelected) {
+                        updateSelectedPost();
+                    }
+                    return;
+                }
+                
+                // 临时禁用CSS的scroll-behavior，确保JavaScript完全控制滚动
+                const originalScrollBehavior = container.style.scrollBehavior;
+                container.style.scrollBehavior = 'auto';
+                
+                // 动画参数
+                const duration = 500; // 动画时长（毫秒）
+                const startTime = performance.now();
+                
+                // 动画函数（使用缓动曲线）
+                function animate(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1); // 0 到 1
+                    
+                    // 应用缓动函数，速度从大逐渐减小到0
+                    const easedProgress = easeOutCubic(progress);
+                    
+                    // 计算当前滚动位置
+                    const currentScrollTop = startScrollTop + distance * easedProgress;
+                    container.scrollTop = Math.max(0, currentScrollTop);
+                    
+                    if (progress < 1) {
+                        // 继续动画
+                        scrollAnimationId = requestAnimationFrame(animate);
+                    } else {
+                        // 动画完成，恢复CSS的scroll-behavior
+                        container.style.scrollBehavior = originalScrollBehavior;
+                        scrollAnimationId = null;
+                        isScrolling = false;
+                        if (!skipUpdateSelected) {
+                            updateSelectedPost();
+                            // 滚动完成后，更新选择器为最终投稿的年月
+                            const finalPost = findCenterPost();
+                            if (finalPost) {
+                                updatePickersFromPost(finalPost);
+                            }
+                        }
+                    }
+                }
+                
+                // 开始动画
+                scrollAnimationId = requestAnimationFrame(animate);
+            }
+            
+            // 更新选中状态（不滚动）
+            let isScrolling = false;
+            function updateSelectedPost() {
+                if (isScrolling) return; // 如果正在程序化滚动，不更新选中状态
+                
+                const centerPost = findCenterPost();
+                if (!centerPost) return;
+                
+                // 移除所有选中状态
+                postsList.querySelectorAll('.post-item').forEach(post => {
+                    post.classList.remove('selected');
+                });
+                
+                // 添加选中状态到中心投稿
+                centerPost.classList.add('selected');
+                // 注意：不在滚动过程中更新选择器，避免闪烁
+            }
+            
+            // 对齐到最近的投稿并选中
+            function alignToNearestPost() {
+                if (isScrolling) return; // 如果正在程序化滚动，不执行对齐
+                
+                const centerPost = findCenterPost();
+                if (!centerPost) return;
+                
+                // 检查当前中心投稿是否真的在中心
+                const container = postsList;
+                const containerRect = container.getBoundingClientRect();
+                const postRect = centerPost.getBoundingClientRect();
+                const containerCenterY = containerRect.top + containerRect.height / 2;
+                const postCenterY = postRect.top + postRect.height / 2;
+                const offset = Math.abs(postCenterY - containerCenterY);
+                
+                // 如果偏移超过阈值（比如20px），则自动对齐
+                const threshold = 20;
+                if (offset > threshold) {
+                    scrollPostToCenter(centerPost);
+                } else {
+                    // 如果已经在中心附近，直接更新选中状态
+                    updateSelectedPost();
+                }
+            }
+            
+            // 滚动到指定年月的第一个投稿并居中
+            function scrollToMonth(selectedYear, selectedMonth) {
+                if (!selectedYear || !selectedMonth) return;
+                
+                const year = parseInt(selectedYear);
+                const month = parseInt(selectedMonth);
+                
+                // 查找第一个匹配的投稿
+                const targetPost = postsList.querySelector(`[data-year="${year}"][data-month="${month}"]`);
+                
+                if (targetPost) {
+                    isScrolling = true; // 标记正在程序化滚动
+                    
+                    // 使用 requestAnimationFrame 确保 DOM 已更新
+                    requestAnimationFrame(() => {
+                        // 计算滚动位置，让投稿居中
+                        const container = postsList;
+                        const containerRect = container.getBoundingClientRect();
+                        const targetRect = targetPost.getBoundingClientRect();
+                        const containerCenterY = containerRect.top + containerRect.height / 2;
+                        const targetCenterY = targetRect.top + targetRect.height / 2;
+                        
+                        // 计算需要滚动的距离
+                        const scrollTop = container.scrollTop + (targetCenterY - containerCenterY);
+                        
+                        // 平滑滚动到目标位置
+                        container.scrollTo({
+                            top: Math.max(0, scrollTop),
+                            behavior: 'smooth'
+                        });
+                        
+                        // 等待滚动完成后更新选中状态
+                        setTimeout(() => {
+                            isScrolling = false;
+                            updateSelectedPost();
+                        }, 500); // 等待滚动动画完成
+                    });
                 }
             }
             
             // 获取当前选中的年月并显示投稿
-            updatePostsDisplay = function(selectedYear, selectedMonth) {
-                // 如果年月都已选中，显示对应投稿
-                if (selectedYear && selectedMonth) {
-                    const monthNames = ['', '1月', '2月', '3月', '4月', '5月', '6月', 
-                                      '7月', '8月', '9月', '10月', '11月', '12月'];
-                    
-                    // 更新日期显示
-                    postsDisplayDate.textContent = `${selectedYear}年${monthNames[selectedMonth]}`;
-                    
-                    // 获取该年月的投稿
-                    const posts = postsData[selectedYear] && postsData[selectedYear][selectedMonth] 
-                        ? postsData[selectedYear][selectedMonth] 
-                        : [];
-                    
-                    // 清空列表
-                    postsList.innerHTML = '';
-                    
-                    if (posts.length > 0) {
-                        // 显示投稿列表
-                        posts.forEach((post, index) => {
-                            const postItem = document.createElement('div');
-                            postItem.className = 'post-item';
-                            postItem.innerHTML = `
-                                <div class="post-item-title">${post.title}</div>
-                                <div class="post-item-content">${post.content}</div>
-                            `;
-                            postsList.appendChild(postItem);
-                        });
-                    } else {
-                        // 显示空状态
-                        postsList.innerHTML = '<div class="posts-empty">该月份暂无投稿内容</div>';
-                    }
-                } else {
-                    // 未选中年月时清空显示
-                    postsDisplayDate.textContent = '请选择年月';
-                    postsList.innerHTML = '';
+            // 标志：是否正在通过滚动list更新选择器（避免触发自动定位）
+            let isUpdatingPickersFromScroll = false;
+            let isInitializing = true; // 初始化标志
+            
+            updatePostsDisplay = function(selectedYear, selectedMonth, skipAutoScroll = false) {
+                // 始终渲染所有投稿
+                renderAllPosts();
+                
+                // 如果年月都已选中，且不是通过滚动list触发的，滚动到对应月份的第一个投稿
+                if (selectedYear && selectedMonth && !skipAutoScroll && !isUpdatingPickersFromScroll) {
+                    // 延迟滚动，确保 DOM 已更新
+                    setTimeout(() => {
+                        scrollToMonth(selectedYear, selectedMonth);
+                    }, 100);
                 }
             };
             
             // 暴露更新函数供全局调用
             window.updatePostsDisplay = updatePostsDisplay;
+            
+            // 暴露重新加载数据的函数
+            window.reloadVideosData = fetchAndOrganizeVideos;
+            
+            // 滚轮事件：每次滚动移动一个投稿，连续滚动可累积
+            let wheelQueue = []; // 滚轮事件队列
+            let wheelTimeout = null;
+            let isProcessingWheel = false;
+            
+            // 处理滚轮队列，滚动到目标投稿
+            function processWheelQueue() {
+                if (isProcessingWheel || wheelQueue.length === 0) {
+                    return;
+                }
+                
+                isProcessingWheel = true;
+                
+                // 排除占位元素
+                const posts = Array.from(postsList.querySelectorAll('.post-item:not(.post-item-spacer)'));
+                if (posts.length === 0) {
+                    wheelQueue = [];
+                    isProcessingWheel = false;
+                    return;
+                }
+                
+                // 找到当前选中的投稿
+                let currentIndex = -1;
+                const selectedPost = postsList.querySelector('.post-item.selected:not(.post-item-spacer)');
+                if (selectedPost) {
+                    currentIndex = posts.indexOf(selectedPost);
+                } else {
+                    // 如果没有选中的，找到最接近中心的投稿
+                    const centerPost = findCenterPost();
+                    if (centerPost) {
+                        currentIndex = posts.indexOf(centerPost);
+                    } else {
+                        currentIndex = 0;
+                    }
+                }
+                
+                // 处理队列中的所有滚轮事件，计算最终目标索引
+                let targetIndex = currentIndex;
+                for (const deltaY of wheelQueue) {
+                    if (deltaY > 0) {
+                        // 向下滚动，切换到下一个
+                        targetIndex = Math.min(targetIndex + 1, posts.length - 1);
+                    } else {
+                        // 向上滚动，切换到上一个
+                        targetIndex = Math.max(targetIndex - 1, 0);
+                    }
+                }
+                
+                // 清空队列
+                wheelQueue = [];
+                
+                // 如果索引没有变化，不处理
+                if (targetIndex === currentIndex) {
+                    isProcessingWheel = false;
+                    return;
+                }
+                
+                // 滚动到目标投稿并选中
+                const targetPost = posts[targetIndex];
+                if (targetPost) {
+                    // 移除所有选中状态
+                    posts.forEach(post => post.classList.remove('selected'));
+                    // 添加选中状态
+                    targetPost.classList.add('selected');
+                    // 滚动到目标投稿（动画完成后会自动更新选择器）
+                    scrollPostToCenter(targetPost);
+                }
+                
+                isProcessingWheel = false;
+            }
+            
+            // 根据投稿的年月更新选择器
+            function updatePickersFromPost(post) {
+                const year = parseInt(post.getAttribute('data-year'));
+                const month = parseInt(post.getAttribute('data-month'));
+                
+                if (!year || !month) return;
+                
+                // 获取选择器元素
+                const yearPickerList = document.getElementById('yearPickerList');
+                const monthPickerList = document.getElementById('monthPickerList');
+                
+                // 检查当前选择器是否已经显示正确的年月，避免不必要的更新和闪烁
+                if (yearPickerList && monthPickerList) {
+                    const selectedYearItem = yearPickerList.querySelector('.year-picker-item.selected');
+                    const selectedMonthItem = monthPickerList.querySelector('.month-picker-item.selected');
+                    
+                    if (selectedYearItem && selectedMonthItem) {
+                        const currentYear = parseInt(selectedYearItem.textContent);
+                        const monthText = selectedMonthItem.textContent;
+                        const currentMonth = parseInt(monthText.replace('月', ''));
+                        
+                        // 如果年月都相同，不需要更新，直接返回
+                        if (currentYear === year && currentMonth === month) {
+                            return;
+                        }
+                    }
+                }
+                
+                // 设置标志，表示正在通过滚动list更新选择器，避免触发自动定位
+                isUpdatingPickersFromScroll = true;
+                
+                // 更新年份选择器
+                const yearPickerContainer = document.getElementById('yearPickerContainer');
+                if (yearPickerList && yearPickerContainer) {
+                    const yearItems = yearPickerList.querySelectorAll('.year-picker-item');
+                    // 获取实际的项目高度
+                    const firstItem = yearItems[0];
+                    const itemHeight = firstItem ? firstItem.getBoundingClientRect().height : 50;
+                    
+                    yearItems.forEach((item, index) => {
+                        const itemYear = parseInt(item.textContent);
+                        if (itemYear === year) {
+                            // 找到对应的年份，滚动到该年份
+                            const containerHeight = yearPickerContainer.clientHeight;
+                            const centerY = containerHeight / 2;
+                            const targetTranslateY = centerY - (index * itemHeight + itemHeight / 2);
+                            
+                            // 计算有效范围
+                            const minTranslateY = centerY - itemHeight / 2;
+                            const maxTranslateY = centerY - (yearItems.length - 1) * itemHeight - itemHeight / 2;
+                            const finalTranslateY = Math.max(maxTranslateY, Math.min(minTranslateY, targetTranslateY));
+                            
+                            // 更新选中状态
+                            yearItems.forEach(i => i.classList.remove('selected'));
+                            item.classList.add('selected');
+                            
+                            // 滚动到目标位置
+                            yearPickerList.style.transform = `translateY(${finalTranslateY}px)`;
+                            
+                            // 更新透明度
+                            yearItems.forEach((i, idx) => {
+                                const itemTop = idx * itemHeight + itemHeight / 2;
+                                const itemCenterInContainer = itemTop + finalTranslateY;
+                                const distance = Math.abs(itemCenterInContainer - centerY);
+                                const maxDistance = containerHeight / 2;
+                                const opacity = Math.max(0, 1 - (distance / maxDistance) * 1.5);
+                                i.style.opacity = opacity;
+                            });
+                        }
+                    });
+                }
+                
+                // 更新月份选择器，传入当前投稿的月份，避免使用之前选择器保存的值
+                if (typeof window.updateMonthPicker === 'function') {
+                    window.updateMonthPicker(year, month);
+                    
+                    // 等待月份选择器更新完成后，滚动到对应的月份
+                    setTimeout(() => {
+                        const monthPickerList = document.getElementById('monthPickerList');
+                        const monthPickerContainer = document.getElementById('monthPickerContainer');
+                        if (monthPickerList && monthPickerContainer) {
+                            const monthItems = monthPickerList.querySelectorAll('.month-picker-item');
+                            // 获取实际的项目高度
+                            const firstMonthItem = monthItems[0];
+                            const monthItemHeight = firstMonthItem ? firstMonthItem.getBoundingClientRect().height : 50;
+                            
+                            monthItems.forEach((item, index) => {
+                                const monthText = item.textContent;
+                                const itemMonth = parseInt(monthText.replace('月', ''));
+                                if (itemMonth === month) {
+                                    // 找到对应的月份，滚动到该月份
+                                    const containerHeight = monthPickerContainer.clientHeight;
+                                    const centerY = containerHeight / 2;
+                                    const targetTranslateY = centerY - (index * monthItemHeight + monthItemHeight / 2);
+                                    
+                                    // 计算有效范围
+                                    const minTranslateY = centerY - monthItemHeight / 2;
+                                    const maxTranslateY = centerY - (monthItems.length - 1) * monthItemHeight - monthItemHeight / 2;
+                                    const finalTranslateY = Math.max(maxTranslateY, Math.min(minTranslateY, targetTranslateY));
+                                    
+                                    // 更新选中状态
+                                    monthItems.forEach(i => i.classList.remove('selected'));
+                                    item.classList.add('selected');
+                                    
+                                    // 使用平滑滚动到目标位置（CSS transition会自动处理动画）
+                                    // 确保transition没有被禁用
+                                    monthPickerList.style.transition = '';
+                                    monthPickerList.style.transform = `translateY(${finalTranslateY}px)`;
+                                    
+                                    // 在滚动完成后更新透明度
+                                    setTimeout(() => {
+                                        monthItems.forEach((i, idx) => {
+                                            const itemTop = idx * monthItemHeight + monthItemHeight / 2;
+                                            const itemCenterInContainer = itemTop + finalTranslateY;
+                                            const distance = Math.abs(itemCenterInContainer - centerY);
+                                            const maxDistance = containerHeight / 2;
+                                            const opacity = Math.max(0, 1 - (distance / maxDistance) * 1.5);
+                                            i.style.opacity = opacity;
+                                        });
+                                    }, 300); // 等待CSS transition完成
+                                }
+                            });
+                        }
+                        // 延迟重置标志，确保所有异步操作（包括updateMonthsForYear中的requestAnimationFrame）都完成
+                        setTimeout(() => {
+                            isUpdatingPickersFromScroll = false;
+                        }, 300);
+                    }, 150);
+                } else {
+                    // 如果没有月份选择器更新，延迟重置标志，确保年份选择器更新完成
+                    setTimeout(() => {
+                        isUpdatingPickersFromScroll = false;
+                    }, 100);
+                }
+            }
+            
+            // 监听滚轮事件
+            postsList.addEventListener('wheel', (e) => {
+                // 如果正在程序化滚动，不处理
+                if (isScrolling) {
+                    return;
+                }
+                
+                // 防止默认滚动行为
+                e.preventDefault();
+                
+                // 将滚轮事件加入队列
+                wheelQueue.push(e.deltaY);
+                
+                // 限制队列长度，避免累积过多
+                if (wheelQueue.length > 20) {
+                    wheelQueue = wheelQueue.slice(-20);
+                }
+                
+                // 延迟处理，让连续滚轮事件可以累积
+                clearTimeout(wheelTimeout);
+                wheelTimeout = setTimeout(() => {
+                    processWheelQueue();
+                }, 50); // 50ms延迟，减少卡顿，同时仍能累积连续滚轮事件
+            }, { passive: false });
+            
+            // 监听滚动事件（仅用于更新选中状态，不自动对齐）
+            let scrollAnimationFrame = null;
+            
+            postsList.addEventListener('scroll', () => {
+                // 如果正在程序化滚动，不处理
+                if (isScrolling) {
+                    return;
+                }
+                
+                // 使用 requestAnimationFrame 实现平滑更新选中状态（视觉反馈）
+                if (scrollAnimationFrame) {
+                    cancelAnimationFrame(scrollAnimationFrame);
+                }
+                
+                scrollAnimationFrame = requestAnimationFrame(() => {
+                    // 只在没有选中状态时更新（避免与滚轮切换冲突）
+                    const selectedPost = postsList.querySelector('.post-item.selected');
+                    if (!selectedPost) {
+                        updateSelectedPost();
+                    }
+                });
+            });
+            
+            // 监听点击事件：点击未选中的投稿时滚动到该投稿，点击选中的投稿时跳转链接
+            postsList.addEventListener('click', (e) => {
+                // 查找被点击的投稿元素（可能是.post-item本身或其子元素）
+                const clickedPost = e.target.closest('.post-item:not(.post-item-spacer)');
+                if (!clickedPost) return;
+                
+                // 检查是否是被选中的投稿
+                const isSelected = clickedPost.classList.contains('selected');
+                
+                if (!isSelected) {
+                    // 如果点击的是未选中的投稿，阻止默认跳转行为
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // 滚动到该投稿并选中
+                    isUpdatingPickersFromScroll = true;
+                    scrollPostToCenter(clickedPost);
+                    
+                    // 更新选择器为点击投稿的年月
+                    setTimeout(() => {
+                        updatePickersFromPost(clickedPost);
+                        setTimeout(() => {
+                            isUpdatingPickersFromScroll = false;
+                        }, 300);
+                    }, 600); // 等待滚动动画完成
+                }
+                // 如果点击的是已选中的投稿，允许默认行为（跳转链接）
+            });
+            
         }
         
         // 页面加载完成后初始化投稿展示区域
@@ -2136,7 +3301,6 @@
 
         // Bilibili 空间嵌入模块 - 固定URL
         // 用户统计信息更新
-        const USER_MID = '3493274442533075';
         // 使用新的数据 API
         const API_BASE_URL = 'https://dataapi.kabikingu.com';
         const UPDATE_INTERVAL = 5000; // 5秒
