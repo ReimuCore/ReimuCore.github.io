@@ -947,6 +947,7 @@
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
+            pointer-events: none;
         }
 
         .footer-image:hover {
@@ -1013,6 +1014,7 @@
             pointer-events: auto;
             cursor: pointer;
             box-shadow: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .footer-hover-area:hover {
@@ -1069,173 +1071,6 @@
         }
 
         @media (max-width: 768px) {
-            header {
-                padding: 0.8rem 1rem;
-                padding-left: 3.5rem;
-            }
-
-            nav {
-                flex-direction: row;
-                gap: 0.5rem;
-                flex-wrap: wrap;
-            }
-
-            .sidebar {
-                width: 280px;
-                top: 70px;
-                height: calc(100vh - 70px);
-            }
-
-            .sidebar-overlay {
-                top: 70px;
-                height: calc(100vh - 70px);
-            }
-
-            .nav-links {
-                gap: 0.5rem;
-                flex-wrap: wrap;
-                justify-content: flex-end;
-            }
-
-            .nav-links a {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.85rem;
-            }
-
-            main {
-                margin-top: 80px;
-                padding: 1rem;
-                flex-direction: column;
-                gap: 1.5rem;
-                align-items: center;
-            }
-            
-            #userStatsCard {
-                flex: 0 0 auto;
-                width: 100%;
-                max-width: 100%;
-                min-height: auto;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-
-            .stats-container {
-                gap: 1.5rem;
-                padding: 1rem 0;
-                width: 100%;
-                max-width: 100%;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .stat-item {
-                padding: 1.5rem 1rem;
-            }
-
-            .stat-label {
-                font-size: 1.2rem;
-                margin-bottom: 0.8rem;
-            }
-
-            .stat-value {
-                font-size: 2.5rem;
-            }
-
-            .posts-picker-container {
-                position: fixed;
-                left: 0;
-                right: 0;
-                flex-direction: column;
-                align-items: stretch;
-                padding: 1rem;
-                gap: 1.5rem;
-                width: 100%;
-                max-width: 100%;
-                order: 2;
-            }
-            
-            #userStatsCard {
-                order: 1;
-            }
-
-            .pickers-group {
-                width: 100%;
-                max-width: 100%;
-                justify-content: center;
-                gap: 1rem;
-                flex-wrap: nowrap;
-                overflow-x: hidden;
-            }
-
-            .year-picker,
-            .month-picker {
-                width: 80px;
-                min-width: 80px;
-                max-width: 80px;
-                height: 50vh;
-                max-height: 400px;
-                flex-shrink: 0;
-            }
-
-            .posts-display {
-                position: relative;
-                width: 100%;
-                height: 100%;
-                min-height: 50vh;
-                padding: 0;
-                overflow: hidden;
-            }
-            
-            .posts-list {
-                padding: 120px 1.5rem 200px;
-            }
-
-            .posts-display-title {
-                font-size: 1.3rem;
-            }
-
-            .posts-display-date {
-                font-size: 0.9rem;
-            }
-
-            .posts-list {
-                display: flex;
-                flex-direction: column;
-                gap: 0.8rem;
-            }
-
-            .top-link {
-                top: 90px;
-                right: 10px;
-                font-size: 0.75rem;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            h2 {
-                font-size: 1.5rem;
-            }
-
-            footer {
-                padding: 1.5rem 1rem;
-            }
-
-            .footer-image {
-                max-width: 200px;
-            }
-
-            .footer-image-bottom {
-                max-width: 100%;
-                left: 50%;
-            }
-        }
-
-        @media (max-width: 480px) {
             header {
                 padding: 0.6rem 0.8rem;
                 padding-left: 3rem;
@@ -1418,8 +1253,10 @@
             }
 
             .footer-image-bottom {
-                max-width: 95%;
-                bottom: -150px;
+                max-width: 50%;
+                bottom: -200px;
+                left: 43%;
+                transform: translateX(-50%) translateY(50px) scale(0.8);
             }
 
             .footer-hover-area {
@@ -1444,65 +1281,6 @@
 
             h2 {
                 font-size: 1.3rem;
-            }
-        }
-
-        /* 超小屏幕设备 (< 360px) */
-        @media (max-width: 360px) {
-            header {
-                padding: 0.5rem 0.6rem;
-                padding-left: 2.5rem;
-            }
-
-            .logo {
-                font-size: 1rem;
-            }
-
-            .sidebar-toggle {
-                width: 32px;
-                height: 32px;
-            }
-
-            .nav-links a {
-                padding: 0.25rem 0.5rem;
-                font-size: 0.75rem;
-            }
-
-            main {
-                padding: 0.6rem;
-            }
-
-            .stat-label {
-                font-size: 0.9rem;
-            }
-
-            .stat-value {
-                font-size: 1.8rem;
-            }
-
-            .year-picker,
-            .month-picker {
-                width: 60px;
-                height: 35vh;
-                max-height: 250px;
-            }
-
-            .posts-display {
-                padding: 0.8rem;
-            }
-
-            .posts-display-title {
-                font-size: 1rem;
-            }
-
-            .posts-list {
-                display: flex;
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .footer-image {
-                max-width: 120px;
             }
         }
 
@@ -1567,6 +1345,133 @@
                 -webkit-overflow-scrolling: touch;
             }
         }
+
+        /* 竖屏时隐藏日期选择器和投稿列表 */
+        @media (orientation: portrait) {
+            .pickers-group {
+                display: none !important;
+            }
+
+            .posts-display {
+                display: none !important;
+            }
+
+            /* 竖屏下固定png1和png2的大小，不随窗口大小改变 */
+            .footer-image {
+                width: 250px !important;
+                max-width: none !important;
+            }
+
+            .footer-image-bottom {
+                width: 1200px !important;
+                max-width: none !important;
+            }
+        }
+
+        /* 移动端投稿列表样式 */
+        .mobile-posts-container {
+            display: none;
+            width: 100%;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .mobile-posts-container.active {
+            display: block;
+        }
+
+        .mobile-posts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0;
+        }
+
+        @media (max-width: 480px) {
+            .mobile-posts-grid {
+                gap: 0.3rem;
+            }
+        }
+
+        .mobile-post-item {
+            aspect-ratio: 4 / 3;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .mobile-post-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        .mobile-post-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .mobile-post-item .mobile-post-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            padding: 0.3rem;
+            color: #fff;
+            font-size: 0.7rem;
+            line-height: 1.2;
+            max-height: 50%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        /* 投稿页面隐藏footer（所有屏幕尺寸） */
+        main.page-posts footer,
+        .page-posts footer,
+        body .page-posts footer {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
+
+        /* 移动端页面切换 */
+        @media (max-width: 768px) {
+            .page-home #userStatsCard,
+            .page-home footer {
+                display: block;
+            }
+
+            .page-posts #userStatsCard {
+                display: none;
+            }
+
+            .page-posts .footer-image,
+            .page-posts .footer-image-bottom {
+                display: none !important;
+            }
+
+            .page-posts .posts-picker-container {
+                display: none;
+            }
+
+            .mobile-posts-container {
+                display: none;
+            }
+
+            .page-posts .mobile-posts-container {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1586,8 +1491,7 @@
             <div class="logo">首页</div>
             <ul class="nav-links">
                 <li><a href="#home">首页</a></li>
-                <li><a href="#about">关于</a></li>
-                <li><a href="#contact">联系</a></li>
+                <li><a href="#posts">投稿</a></li>
             </ul>
             <a href="../index.html" class="top-link">返回</a>
         </nav>
@@ -1651,6 +1555,12 @@
                         <ul class="month-picker-list" id="monthPickerList"></ul>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- 移动端投稿列表容器（一行三个） -->
+        <div class="mobile-posts-container" id="mobilePostsContainer">
+            <div class="mobile-posts-grid" id="mobilePostsGrid">
             </div>
         </div>
     </main>
@@ -2477,21 +2387,36 @@
         // 注意：USER_MID 在后面的用户统计信息更新部分声明，这里先检查是否存在
         let postsData = {};
         let updatePostsDisplay = null;
-        const VIDEOS_API_URL = 'https://quiet-dew-d623.484540891.workers.dev/videos';
+        const VIDEOS_API_URL = 'https://dataapi.kabikingu.com/videos';
         
         // 从API获取视频数据并分类到年月
         async function fetchAndOrganizeVideos() {
             try {
-                const response = await fetch(`${VIDEOS_API_URL}?mid=${USER_MID}`);
+                const url = `${VIDEOS_API_URL}?mid=${USER_MID}`;
+                console.log('请求投稿URL:', url);
+                
+                const response = await fetch(url);
+                
+                // 检查HTTP状态
                 if (!response.ok) {
-                    throw new Error(`HTTP错误: ${response.status}`);
+                    throw new Error(`HTTP错误: ${response.status} ${response.statusText}`);
                 }
                 
                 const data = await response.json();
                 
+                // 打印调试信息
+                console.log('投稿API返回数据:', data);
+                
+                // 检查API返回的错误
+                if (data.error) {
+                    console.error('获取投稿数据失败:', data.error);
+                    throw new Error(data.error);
+                }
+                
+                // 检查数据格式
                 if (!data.videos || !Array.isArray(data.videos)) {
-                    console.warn('API返回数据格式不正确');
-                    return;
+                    console.warn('API返回数据格式不正确，期望data.videos为数组，实际:', data);
+                    throw new Error('API返回数据格式不正确');
                 }
                 
                 // 清空现有数据
@@ -2564,10 +2489,25 @@
                     // 初始化时不触发自动定位，而是等待初始化代码选择最新投稿
                     window.updatePostsDisplay(selectedYear, selectedMonth, true);
                 }
+                
+                // 如果当前在移动端投稿页面，渲染移动端投稿列表
+                if (window.innerWidth <= 768) {
+                    const main = document.querySelector('main');
+                    if (main && main.classList.contains('page-posts')) {
+                        if (typeof window.renderMobilePosts === 'function') {
+                            window.renderMobilePosts();
+                        }
+                    }
+                }
             } catch (error) {
                 console.error('获取视频数据失败:', error);
                 // 初始化空数据结构，避免后续错误
                 postsData = {};
+                // 在页面上显示错误提示（如果有postsList元素）
+                const postsList = document.getElementById('postsList');
+                if (postsList) {
+                    postsList.innerHTML = `<div class="posts-empty">获取投稿数据失败: ${error.message}</div>`;
+                }
             }
         }
         
@@ -3255,11 +3195,121 @@
         }
         
         // 页面加载完成后初始化投稿展示区域
-        window.addEventListener('load', initPostsDisplay);
+        window.addEventListener('load', function() {
+            initPostsDisplay();
+            
+            // 初始化页面状态（移动端默认显示首页）
+            if (window.innerWidth <= 768) {
+                switchPage('home');
+            }
+        });
+        
+        // 将renderMobilePosts暴露到全局作用域
+        window.renderMobilePosts = renderMobilePosts;
 
-        // 为导航链接添加点击波纹效果
+        // 页面切换逻辑（移动端）
+        function switchPage(page) {
+            const main = document.querySelector('main');
+            const footer = document.querySelector('footer');
+            if (!main) return;
+            
+            // 移除所有页面类
+            main.classList.remove('page-home', 'page-posts', 'page-about', 'page-contact');
+            
+            // 添加当前页面类
+            if (page) {
+                main.classList.add(`page-${page}`);
+            } else {
+                main.classList.add('page-home');
+            }
+            
+            // 强制控制footer显示/隐藏
+            if (footer) {
+                if (page === 'posts') {
+                    footer.style.display = 'none';
+                    footer.style.visibility = 'hidden';
+                } else {
+                    footer.style.display = '';
+                    footer.style.visibility = '';
+                }
+            }
+        }
+
+        // 移动端投稿列表渲染函数
+        function renderMobilePosts() {
+            const mobilePostsGrid = document.getElementById('mobilePostsGrid');
+            if (!mobilePostsGrid) return;
+            
+            // 清空现有内容
+            mobilePostsGrid.innerHTML = '';
+            
+            // 收集所有投稿并按时间从新到旧排序
+            const allPosts = [];
+            Object.keys(postsData).sort((a, b) => parseInt(b) - parseInt(a)).forEach(year => {
+                Object.keys(postsData[year]).sort((a, b) => parseInt(b) - parseInt(a)).forEach(month => {
+                    postsData[year][month].forEach(post => {
+                        allPosts.push({
+                            ...post,
+                            year: parseInt(year),
+                            month: parseInt(month)
+                        });
+                    });
+                });
+            });
+            
+            // 按发布时间从新到旧排序
+            allPosts.sort((a, b) => b.pubdate - a.pubdate);
+            
+            if (allPosts.length === 0) {
+                mobilePostsGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: rgba(255, 255, 255, 0.5); padding: 2rem;">暂无投稿内容</div>';
+                return;
+            }
+            
+            // 渲染投稿（一行三个）
+            allPosts.forEach(post => {
+                const postItem = document.createElement('div');
+                postItem.className = 'mobile-post-item';
+                postItem.onclick = () => {
+                    window.open(`https://www.bilibili.com/video/${post.bvid}`, '_blank');
+                };
+                
+                const img = document.createElement('img');
+                img.src = post.cover || '';
+                img.alt = post.title || '';
+                img.loading = 'lazy';
+                
+                const overlay = document.createElement('div');
+                overlay.className = 'mobile-post-overlay';
+                overlay.textContent = post.title || '';
+                
+                postItem.appendChild(img);
+                postItem.appendChild(overlay);
+                mobilePostsGrid.appendChild(postItem);
+            });
+        }
+
+        // 为导航链接添加点击事件和波纹效果
         document.querySelectorAll('.nav-links a').forEach(link => {
             link.addEventListener('click', function(e) {
+                // 页面切换逻辑
+                const href = this.getAttribute('href');
+                if (href) {
+                    const page = href.replace('#', '');
+                    if (window.innerWidth <= 768) {
+                        // 移动端：切换页面
+                        e.preventDefault();
+                        switchPage(page);
+                        
+                        // 如果是投稿页面，渲染移动端投稿列表
+                        if (page === 'posts') {
+                            if (typeof window.renderMobilePosts === 'function') {
+                                window.renderMobilePosts();
+                            }
+                        }
+                    }
+                }
+                
+                // 波纹效果
                 const ripple = document.createElement('span');
                 const rect = this.getBoundingClientRect();
                 const size = Math.max(rect.width, rect.height);
@@ -3542,10 +3592,30 @@
 
         if (hoverArea && footerImageBottom) {
             let bounceTimeout = null;
-
-            hoverArea.addEventListener('mouseenter', function() {
+            let autoResetTimeout = null;
+            
+            // 检测是否为移动端
+            const isMobile = window.matchMedia('(max-width: 768px)').matches || 
+                           ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+            
+            // 获取基础transform值（根据屏幕尺寸）
+            function getBaseTransform() {
+                if (window.matchMedia('(max-width: 768px)').matches) {
+                    return 'translateX(-50%) translateY(50px) scale(0.8)';
+                }
+                return 'translateX(-50%) translateY(0)';
+            }
+            
+            // 获取网页基础transform值（桌面端值）
+            function getWebBaseTransform() {
+                return 'translateX(-50%) translateY(0)';
+            }
+            
+            // 触发hover效果
+            function triggerHover() {
                 // 清除之前的定时器
                 if (bounceTimeout) clearTimeout(bounceTimeout);
+                if (autoResetTimeout) clearTimeout(autoResetTimeout);
                 
                 // 先移动到 -100px
                 footerImageBottom.style.transform = 'translateX(-50%) translateY(-100px)';
@@ -3554,12 +3624,38 @@
                 bounceTimeout = setTimeout(() => {
                     footerImageBottom.style.transform = 'translateX(-50%) translateY(-90px)';
                 }, 300);
-            });
-
-            hoverArea.addEventListener('mouseleave', function() {
+                
+                // 移动端：1秒后自动失焦，重置为网页基础transform
+                if (isMobile) {
+                    autoResetTimeout = setTimeout(() => {
+                        footerImageBottom.style.transform = getWebBaseTransform();
+                    }, 1000);
+                }
+            }
+            
+            // 取消hover效果
+            function cancelHover() {
                 if (bounceTimeout) clearTimeout(bounceTimeout);
-                footerImageBottom.style.transform = 'translateX(-50%) translateY(0)';
-            });
+                if (autoResetTimeout) clearTimeout(autoResetTimeout);
+                footerImageBottom.style.transform = getBaseTransform();
+            }
+
+            // 桌面端：鼠标事件
+            hoverArea.addEventListener('mouseenter', triggerHover);
+            hoverArea.addEventListener('mouseleave', cancelHover);
+            
+            // 移动端：触摸事件
+            if (isMobile) {
+                hoverArea.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    triggerHover();
+                }, { passive: false });
+                
+                hoverArea.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    // 不立即取消，让自动失焦定时器处理
+                }, { passive: false });
+            }
         }
     </script>
 </body>

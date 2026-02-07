@@ -5,15 +5,20 @@
 ```
 kabikingu-site/
 ├── home/                       # 前端页面
-│   └── index.html             # 主页面（显示用户统计）
+│   └── index.html             # 主页面（显示用户统计和投稿列表）
 ├── static/                     # 静态资源
 │   ├── favicon.ico            # 网站图标
-│   └── bilibili.png           # B站图标
+│   ├── bilibili.png           # B站图标
+│   ├── footer-png1.png        # Footer图片1
+│   └── footer-png2.png        # Footer图片2
+├── fonts/                      # 字体文件
+│   └── Minecraft.ttf          # Minecraft字体
 ├── docs/                       # 文档
 │   ├── API_IMPLEMENTATION.md  # API实现说明
 │   └── PROJECT_STRUCTURE.md   # 本文件
-├── scripts/                    # 工具脚本
-│   └── cloudflare_worker.js   # Cloudflare Workers API代码
+├── worker.js                   # Cloudflare Workers API代码
+├── index.html                  # 首页（建设中页面）
+├── CNAME                       # GitHub Pages域名配置
 └── README.md                   # 项目说明
 ```
 
@@ -22,17 +27,21 @@ kabikingu-site/
 ### 前端
 
 - **`home/index.html`**
-  - 主页面，显示用户粉丝数和获赞数
-  - 每3秒自动从 Cloudflare Workers API 获取数据
-  - 使用Flexbox布局，左侧显示统计数据，右侧显示iframe
+  - 主页面，显示用户粉丝数、获赞数和投稿列表
+  - 每5秒自动从 API 获取统计数据
+  - 支持桌面端和移动端响应式布局
+  - 桌面端：右侧显示投稿列表和年月选择器
+  - 移动端：支持页面切换（首页/投稿）
 
 ### API
 
-- **`scripts/cloudflare_worker.js`**
+- **`worker.js`**
   - Cloudflare Workers API代码
-  - 代理B站 `https://api.bilibili.com/x/web-interface/card` API
+  - 代理B站 `https://api.bilibili.com/x/web-interface/card` API（用户统计）
+  - 代理B站 `https://api.bilibili.com/x/web-interface/view` API（视频信息）
+  - 提供图片代理功能（/image端点）
   - 处理CORS，返回格式化的JSON数据
-  - 不需要Cookie或WBI签名
+  - 部署到 `dataapi.kabikingu.com` 域名
 
 ## 数据流
 
@@ -75,9 +84,10 @@ Cloudflare Workers 代理请求 B站API
 
 1. 登录 Cloudflare Dashboard
 2. 进入 Workers & Pages
-3. 创建新的 Worker
-4. 将 `scripts/cloudflare_worker.js` 的内容复制到 Worker
-5. 保存并部署
+3. 创建新的 Worker 或编辑现有 Worker
+4. 将 `worker.js` 的内容复制到 Worker
+5. 绑定自定义域名 `dataapi.kabikingu.com`
+6. 保存并部署
 
 ## 技术栈
 
