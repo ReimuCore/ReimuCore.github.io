@@ -2391,6 +2391,69 @@
         let updatePostsDisplay = null;
         const VIDEOS_API_URL = 'https://dataapi.kabikingu.com/videos';
         
+        // 处理封面 URL，添加 B 站图片压缩后缀
+        function processCoverUrl(coverUrl) {
+            if (!coverUrl) return '';
+            
+            // 修复双https://的问题
+            if (coverUrl.includes('https://https://')) {
+                coverUrl = coverUrl.replace('https://https://', 'https://');
+            }
+            
+            // 检查是否是代理 URL (dataapi.kabikingu.com/image?url=...)
+            if (coverUrl.includes('dataapi.kabikingu.com/image?url=')) {
+                // 提取原始 URL
+                const urlMatch = coverUrl.match(/url=([^&]+)/);
+                if (urlMatch) {
+                    try {
+                        const originalUrl = decodeURIComponent(urlMatch[1]);
+                        // 对原始 URL 添加压缩后缀
+                        const compressedUrl = addBilibiliImageSuffix(originalUrl);
+                        // 重新构建代理 URL
+                        return `https://dataapi.kabikingu.com/image?url=${encodeURIComponent(compressedUrl)}`;
+                    } catch (e) {
+                        console.warn('处理封面 URL 失败:', e);
+                        return coverUrl;
+                    }
+                }
+            } else {
+                // 直接是原始 URL，直接添加后缀
+                return addBilibiliImageSuffix(coverUrl);
+            }
+            
+            return coverUrl;
+        }
+        
+        // 为 B 站图片 URL 添加压缩后缀 @480w_270h_1c.webp
+        function addBilibiliImageSuffix(imageUrl) {
+            if (!imageUrl) return '';
+            
+            // 检查是否是 B 站图片 URL
+            if (imageUrl.includes('hdslb.com') || imageUrl.includes('biliimg.com')) {
+                try {
+                    const url = new URL(imageUrl);
+                    const pathname = url.pathname;
+                    
+                    // 移除已有的压缩后缀（如果有）
+                    const pathWithoutSuffix = pathname.replace(/@[\w_]+\.(jpg|jpeg|png|webp)$/i, '');
+                    
+                    // 获取原始扩展名
+                    const extMatch = pathname.match(/\.(jpg|jpeg|png|webp)$/i);
+                    const originalExt = extMatch ? extMatch[1].toLowerCase() : 'jpg';
+                    
+                    // 添加压缩后缀：@480w_270h_1c.webp
+                    const newPath = `${pathWithoutSuffix}@480w_270h_1c.webp`;
+                    
+                    return `${url.origin}${newPath}`;
+                } catch (e) {
+                    console.warn('添加图片压缩后缀失败:', e);
+                    return imageUrl;
+                }
+            }
+            
+            return imageUrl;
+        }
+        
         // 从API获取视频数据并分类到年月
         async function fetchAndOrganizeVideos() {
             try {
@@ -2447,12 +2510,8 @@
                         postsData[year][month] = [];
                     }
                     
-                    // 直接使用API返回的cover URL（修复双https问题）
-                    let coverUrl = video.cover || '';
-                    // 修复双https://的问题
-                    if (coverUrl && coverUrl.includes('https://https://')) {
-                        coverUrl = coverUrl.replace('https://https://', 'https://');
-                    }
+                    // 处理封面 URL，添加压缩后缀
+                    let coverUrl = processCoverUrl(video.cover || '');
                     
                     // 添加视频数据
                     postsData[year][month].push({
@@ -2570,7 +2629,8 @@
                     postItem.setAttribute('data-pubdate', post.pubdate || '');
                     
                     const img = document.createElement('img');
-                    img.src = post.cover || '';
+                    // 使用处理后的封面 URL（已包含压缩后缀）
+                    img.src = processCoverUrl(post.cover || '');
                     img.alt = post.title || '视频封面';
                     img.className = 'post-item-cover';
                     img.loading = 'lazy';
@@ -3276,7 +3336,8 @@
                 };
                 
                 const img = document.createElement('img');
-                img.src = post.cover || '';
+                // 使用处理后的封面 URL（已包含压缩后缀）
+                img.src = processCoverUrl(post.cover || '');
                 img.alt = post.title || '';
                 img.loading = 'lazy';
                 
