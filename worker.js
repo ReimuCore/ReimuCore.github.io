@@ -1,6 +1,17 @@
+/**
+ * Cloudflare Workers API 代理服务
+ * 
+ * 功能：
+ * 1. 代理B站用户统计API（/x/web-interface/card）
+ * 2. 代理B站视频信息API（/x/web-interface/view）
+ * 3. 提供图片代理服务（/image端点），解决跨域和防盗链问题
+ * 4. 处理CORS，允许前端跨域请求
+ * 
+ * 部署地址：https://dataapi.kabikingu.com
+ */
 export default {
     async fetch(request) {
-      // 处理CORS预检请求
+      // 处理CORS预检请求（OPTIONS方法）
       if (request.method === 'OPTIONS') {
         return new Response(null, {
           headers: {
@@ -14,8 +25,11 @@ export default {
       try {
         const url = new URL(request.url)
         const pathname = url.pathname
-              // ===== 新增：视频列表接口（不影响原逻辑）=====
-              if (pathname === '/image') {
+        
+        // ===== 图片代理接口 =====
+        // 用途：代理B站图片，解决跨域和防盗链问题
+        // 请求格式：/image?url=<图片URL>
+        if (pathname === '/image') {
                 const imageUrl = url.searchParams.get('url')
                 if (!imageUrl) {
                   return new Response('missing url', { status: 400 })
@@ -37,9 +51,14 @@ export default {
                 })
               }
               
-              if (pathname.startsWith('/videos')) {
+        // ===== 视频列表接口 =====
+        // 用途：批量获取指定UP主的视频信息
+        // 请求格式：/videos?mid=<用户ID>
+        // 注意：当前使用硬编码的BV列表，后续可改为从B站API动态获取
+        if (pathname.startsWith('/videos')) {
                 const mid = url.searchParams.get('mid') || '3493274442533075'
         
+                // 硬编码的视频BV列表（待优化：从B站API动态获取）
                 const bvList = [
                   'BV18C6EBTEzd',
                   'BV1FazNBLEzN',
@@ -84,9 +103,11 @@ export default {
         
                 const results = []
         
+                // 遍历BV列表，获取每个视频的详细信息
                 for (const bvid of bvList) {
                   const apiUrl = `https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`
         
+                  // 调用B站视频信息API
                   const resp = await fetch(apiUrl, {
                     headers: {
                       'User-Agent': 'Mozilla/5.0',
@@ -95,13 +116,14 @@ export default {
                   })
         
                   const json = await resp.json()
+                  // 检查API返回状态
                   if (json.code === 0) {
                     const data = json.data
                     results.push({
-                      bvid,
-                      title: data.title,
-                      cover: `https://dataapi.kabikingu.com/image?url=${encodeURIComponent(data.pic)}`,
-                      pubdate: data.pubdate
+                      bvid,                                    // 视频BV号
+                      title: data.title,                      // 视频标题
+                      cover: `https://dataapi.kabikingu.com/image?url=${encodeURIComponent(data.pic)}`,  // 封面图（通过图片代理）
+                      pubdate: data.pubdate                    // 发布时间（Unix时间戳）
                     })
                   }
                 }
@@ -121,10 +143,13 @@ export default {
                 )
               }
   
+        // ===== 用户统计信息接口（默认路径） =====
+        // 用途：获取B站UP主的粉丝数、获赞数等统计信息
+        // 请求格式：/?mid=<用户ID>&photo=<true|false>
         const mid = url.searchParams.get('mid') || '3493274442533075'
         const photo = url.searchParams.get('photo') || 'false'
   
-        // 调用B站API
+        // 调用B站用户卡片API
         const apiUrl = `https://api.bilibili.com/x/web-interface/card?mid=${mid}&photo=${photo}`
         const resp = await fetch(apiUrl, {
           headers: {
@@ -170,10 +195,12 @@ export default {
         const cardData = json.data || {}
         
         // 优先从data直接获取，如果没有则从card对象获取
+        // 注意：B站API数据结构可能变化，需要兼容多种字段名
         let follower = cardData.follower
         let like_num = cardData.like_num
   
         // 如果data中有card对象，尝试从card中获取（字段名可能不同）
+        // 兼容性处理：B站API可能在不同位置返回相同数据，字段名可能不同
         if (cardData.card && typeof cardData.card === 'object') {
           const card = cardData.card
           // card中可能是fans而不是follower
@@ -186,15 +213,16 @@ export default {
           }
         }
   
-        // 返回数据
+        // 返回格式化的数据给前端
+        // 统一数据格式，确保前端能稳定获取数据
         return new Response(
           JSON.stringify({
-            mid: cardData.mid || mid,
-            follower: follower || 0,
-            like_num: like_num || 0,
-            archive_count: cardData.archive_count || 0,
-            article_count: cardData.article_count || 0,
-            following: cardData.following || false
+            mid: cardData.mid || mid,                    // 用户ID
+            follower: follower || 0,                     // 粉丝数
+            like_num: like_num || 0,                     // 获赞数
+            archive_count: cardData.archive_count || 0,  // 投稿数
+            article_count: cardData.article_count || 0, // 文章数
+            following: cardData.following || false       // 是否关注
           }),
           {
             headers: {
@@ -204,6 +232,7 @@ export default {
           }
         )
       } catch (error) {
+        // 错误处理：捕获所有异常并返回错误信息
         return new Response(
           JSON.stringify({
             error: error.message || '处理失败'
@@ -212,7 +241,7 @@ export default {
             status: 500,
             headers: {
               'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*'
+              'Access-Control-Allow-Origin': '*'  // 允许跨域，即使出错也返回CORS头
             }
           }
         )

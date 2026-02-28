@@ -48,13 +48,13 @@ kabikingu-site/
 ```
 用户打开 home/index.html
     ↓
-前端JavaScript每3秒调用 Cloudflare Workers API
+前端JavaScript每5秒调用 Cloudflare Workers API
     ↓
 Cloudflare Workers 代理请求 B站API
     ↓
-返回数据给前端
+返回数据给前端（带CORS头）
     ↓
-前端更新页面显示
+前端更新页面显示（仅在数值增长时更新）
 ```
 
 ## 部署说明

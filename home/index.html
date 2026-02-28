@@ -1588,10 +1588,20 @@
     </footer>
 
     <script>
-        // 全局常量
+        /**
+         * ============================================
+         * 全局配置和常量
+         * ============================================
+         */
+        // B站用户ID（UP主ID）
         const USER_MID = '3493274442533075';
         
-        // 侧边栏控制 - 支持鼠标悬停和触摸点击
+        /**
+         * ============================================
+         * 侧边栏控制模块
+         * ============================================
+         * 功能：支持鼠标悬停（桌面端）和触摸点击（移动端）打开/关闭侧边栏
+         */
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -2385,13 +2395,26 @@
         // 页面加载完成后初始化月份选择器
         window.addEventListener('load', initMonthPicker);
 
-        // 投稿展示区域初始化
-        // 注意：USER_MID 在后面的用户统计信息更新部分声明，这里先检查是否存在
-        let postsData = {};
-        let updatePostsDisplay = null;
-        const VIDEOS_API_URL = 'https://dataapi.kabikingu.com/videos';
+        /**
+         * ============================================
+         * 投稿展示模块
+         * ============================================
+         * 功能：
+         * 1. 从API获取视频列表
+         * 2. 按年月分类组织视频数据
+         * 3. 处理视频封面图片URL（添加压缩后缀、代理处理）
+         * 4. 渲染投稿列表（桌面端和移动端不同布局）
+         */
+        let postsData = {};  // 存储按年月分类的视频数据：{ "2024-01": [...], "2024-02": [...] }
+        let updatePostsDisplay = null;  // 投稿展示更新函数（在fetchAndOrganizeVideos中定义）
+        const VIDEOS_API_URL = 'https://dataapi.kabikingu.com/videos';  // 视频列表API地址
         
-        // 处理封面 URL，添加 B 站图片压缩后缀
+        /**
+         * 处理封面URL
+         * 功能：修复双https问题，处理代理URL，添加B站图片压缩后缀
+         * @param {string} coverUrl - 原始封面URL
+         * @returns {string} 处理后的封面URL
+         */
         function processCoverUrl(coverUrl) {
             if (!coverUrl) return '';
             
@@ -2424,7 +2447,12 @@
             return coverUrl;
         }
         
-        // 为 B 站图片 URL 添加压缩后缀 @480w_270h_1c.webp
+        /**
+         * 为B站图片URL添加压缩后缀
+         * 功能：为B站图片URL添加 @480w_270h_1c.webp 后缀，优化加载速度
+         * @param {string} imageUrl - B站图片URL
+         * @returns {string} 添加压缩后缀后的URL
+         */
         function addBilibiliImageSuffix(imageUrl) {
             if (!imageUrl) return '';
             
@@ -2454,11 +2482,17 @@
             return imageUrl;
         }
         
-        // 从API获取视频数据并分类到年月
+        /**
+         * 从API获取视频数据并分类到年月
+         * 功能：
+         * 1. 调用视频列表API获取所有视频
+         * 2. 根据发布时间（pubdate）按年月分类
+         * 3. 处理封面URL（添加压缩后缀、代理处理）
+         * 4. 初始化投稿展示区域
+         */
         async function fetchAndOrganizeVideos() {
             try {
                 const url = `${VIDEOS_API_URL}?mid=${USER_MID}`;
-                console.log('请求投稿URL:', url);
                 
                 const response = await fetch(url);
                 
@@ -2468,9 +2502,6 @@
                 }
                 
                 const data = await response.json();
-                
-                // 打印调试信息
-                console.log('投稿API返回数据:', data);
                 
                 // 检查API返回的错误
                 if (data.error) {
@@ -2489,16 +2520,12 @@
                 
                 // 处理每个视频，根据时间戳分类到年月
                 data.videos.forEach(video => {
-                    const pubDate = new Date(video.pubdate * 1000); // 时间戳转日期
+                    const pubDate = new Date(video.pubdate * 1000); // Unix时间戳转Date对象
                     const year = pubDate.getFullYear();
-                    const month = pubDate.getMonth() + 1; // getMonth() 返回 0-11
+                    const month = pubDate.getMonth() + 1; // getMonth() 返回 0-11，需要+1
                     
-                    console.log(`处理视频 ${video.bvid}:`, {
-                        pubdate: video.pubdate,
-                        date: pubDate.toISOString(),
-                        year,
-                        month
-                    });
+                    // 生成年月键（格式：YYYY-MM）
+                    const yearMonthKey = `${year}-${String(month).padStart(2, '0')}`;
                     
                     // 初始化年份对象
                     if (!postsData[year]) {
@@ -2529,7 +2556,7 @@
                     });
                 });
                 
-                console.log('视频数据加载完成', postsData);
+                // 视频数据加载完成，初始化投稿展示
                 
                 // 数据加载完成后，渲染所有投稿
                 if (typeof window.updatePostsDisplay === 'function') {
@@ -3578,11 +3605,23 @@
             return `${hours}:${minutes}:${seconds}`;
         }
 
-        // 获取用户卡片信息（通过 Cloudflare Workers）
+        /**
+         * ============================================
+         * 用户统计信息更新模块
+         * ============================================
+         * 功能：
+         * 1. 定期从API获取用户统计信息（粉丝数、获赞数）
+         * 2. 只在数值增长时更新并播放动画
+         * 3. 使用数字动画效果平滑过渡
+         */
+        
+        /**
+         * 获取用户卡片信息（通过 Cloudflare Workers API）
+         * 注意：只有数值增长时才会更新，避免不必要的动画
+         */
         async function fetchUserCard() {
             try {
                 const url = `${API_BASE_URL}?mid=${USER_MID}`;
-                console.log('请求URL:', url);
                 
                 const response = await fetch(url);
                 
@@ -3592,9 +3631,6 @@
                 }
                 
                 const data = await response.json();
-                
-                // 打印调试信息
-                console.log('API返回数据:', data);
                 
                 if (data.error) {
                     console.error('获取用户卡片信息失败:', data.error);
@@ -3643,13 +3679,20 @@
             }
         }
 
-        // 立即执行一次
+        // 立即执行一次（页面加载时）
         fetchUserCard();
 
-        // 每3秒更新一次
+        // 定期更新（每5秒执行一次）
         setInterval(fetchUserCard, UPDATE_INTERVAL);
 
-        // footer-png2 悬停弹跳效果（使用 transform）
+        /**
+         * ============================================
+         * Footer图片悬停效果模块
+         * ============================================
+         * 功能：实现footer图片的悬停弹跳动画
+         * - 桌面端：鼠标悬停时向上移动
+         * - 移动端：触摸时弹跳效果（200px -> 100px -> 110px）
+         */
         const hoverArea = document.querySelector('.footer-hover-area');
         const footerImageBottom = document.querySelector('.footer-image-bottom');
 

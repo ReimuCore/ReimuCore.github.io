@@ -21,12 +21,12 @@ Cloudflare Workers
 ### 1. 前端请求 (`home/index.html`)
 
 ```javascript
-// 每3秒调用一次
-const API_BASE_URL = 'https://quiet-dew-d623.484540891.workers.dev';
+// 每5秒调用一次（实际代码中为UPDATE_INTERVAL常量）
+const API_BASE_URL = 'https://dataapi.kabikingu.com';
 fetch(`${API_BASE_URL}?mid=3493274442533075`)
 ```
 
-### 2. Cloudflare Workers (`scripts/cloudflare_worker.js`)
+### 2. Cloudflare Workers (`worker.js`)
 
 ```javascript
 export default {
@@ -99,8 +99,9 @@ https://api.bilibili.com/x/web-interface/card?mid=<用户ID>
 1. 登录 Cloudflare Dashboard
 2. 进入 Workers & Pages
 3. 创建新的 Worker
-4. 将 `scripts/cloudflare_worker.js` 的内容复制到 Worker 编辑器
-5. 保存并部署
+4. 将 `worker.js` 的内容复制到 Worker 编辑器
+5. 绑定自定义域名 `dataapi.kabikingu.com`（可选）
+6. 保存并部署
 
 ## 可能的问题
 
@@ -134,7 +135,7 @@ https://api.bilibili.com/x/web-interface/card?mid=<用户ID>
 
 直接在浏览器中访问：
 ```
-https://quiet-dew-d623.484540891.workers.dev/?mid=3493274442533075
+https://dataapi.kabikingu.com/?mid=3493274442533075
 ```
 
 应该返回JSON格式的数据。
@@ -174,7 +175,7 @@ https://quiet-dew-d623.484540891.workers.dev/?mid=3493274442533075
 
 2. **查看数据**
    - 页面应该显示粉丝数和获赞数
-   - 每3秒自动更新
+   - 每5秒自动更新（UPDATE_INTERVAL常量控制）
    - 查看浏览器控制台是否有错误
 
 3. **如果失败**
