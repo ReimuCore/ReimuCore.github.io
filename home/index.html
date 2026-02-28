@@ -956,8 +956,8 @@
 
         .footer-image-bottom {
             position: absolute;
-            bottom: -200px;
-            left: 47%;
+            bottom: 200px;
+            left: 50%;
             transform: translateX(-50%);
             max-width: 1200px;
             width: auto;
@@ -996,9 +996,10 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        .footer-image-bottom:hover {
+        /* CSS hover 规则已由 JavaScript 控制，注释掉避免覆盖 transform */
+        /* .footer-image-bottom:hover {
             transform: translateX(-50%) translateY(-30px);
-        }
+        } */
 
         .footer-hover-area {
             position: absolute;
@@ -1023,9 +1024,10 @@
             box-shadow: none;
         }
 
-        .footer-hover-area:hover ~ .footer-image-bottom {
+        /* CSS hover 规则已由 JavaScript 控制，注释掉避免覆盖 transform */
+        /* .footer-hover-area:hover ~ .footer-image-bottom {
             transform: translateX(-50%) translateY(-100px);
-        }
+        } */
 
         @keyframes slideUpFadeIn {
             from {
@@ -1033,7 +1035,7 @@
                 opacity: 0;
             }
             to {
-                bottom: -200px;
+                bottom: -350px;
                 opacity: 1;
             }
         }
@@ -1253,9 +1255,9 @@
             }
 
             .footer-image-bottom {
-                max-width: 50%;
-                bottom: -200px;
-                left: 43%;
+                max-width: 20%;
+                bottom: -500px;
+                left: 50%;
                 transform: translateX(-50%) translateY(50px) scale(0.8);
             }
 
@@ -3601,10 +3603,13 @@
             // 获取基础transform值（根据屏幕尺寸）
             function getBaseTransform() {
                 if (window.matchMedia('(max-width: 768px)').matches) {
-                    return 'translateX(-50%) translateY(50px) scale(0.8)';
+                    return 'translateX(-50%) translateY(200px) scale(0.7)';
                 }
                 return 'translateX(-50%) translateY(0)';
             }
+            
+            // 页面加载时初始化设置 transform（确保覆盖 CSS）
+            footerImageBottom.style.transform = getBaseTransform();
             
             // 获取网页基础transform值（桌面端值）
             function getWebBaseTransform() {
@@ -3617,19 +3622,25 @@
                 if (bounceTimeout) clearTimeout(bounceTimeout);
                 if (autoResetTimeout) clearTimeout(autoResetTimeout);
                 
-                // 先移动到 -100px
-                footerImageBottom.style.transform = 'translateX(-50%) translateY(-100px)';
+                // 根据实时屏幕宽度判断，而不是使用 isMobile 常量（避免触摸设备误判）
+                const isMobileScreen = window.matchMedia('(max-width: 768px)').matches;
                 
-                // 延迟后回弹到 -90px
-                bounceTimeout = setTimeout(() => {
-                    footerImageBottom.style.transform = 'translateX(-50%) translateY(-90px)';
-                }, 300);
-                
-                // 移动端：1秒后自动失焦，重置为网页基础transform
-                if (isMobile) {
+                if (isMobileScreen) {
+                    // 移动端：200px -> 100px -> 110px，保持 scale(0.7)
+                    footerImageBottom.style.transform = 'translateX(-50%) translateY(100px) scale(0.7)';
+                    
+                    // 延迟后回弹到 110px，保持 scale(0.7)
+                    bounceTimeout = setTimeout(() => {
+                        footerImageBottom.style.transform = 'translateX(-50%) translateY(110px) scale(0.7)';
+                    }, 300);
+                    
+                    // 移动端：1秒后自动失焦，重置为移动端基础transform（包含 scale(0.7)）
                     autoResetTimeout = setTimeout(() => {
-                        footerImageBottom.style.transform = getWebBaseTransform();
+                        footerImageBottom.style.transform = getBaseTransform();
                     }, 1000);
+                } else {
+                    // 桌面端：立即向上移动，无计时动画，无缩放
+                    footerImageBottom.style.transform = 'translateX(-50%) translateY(-100px)';
                 }
             }
             
