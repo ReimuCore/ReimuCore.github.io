@@ -55,7 +55,10 @@
             margin: 0;
             padding: 0;
             font-family: "微软雅黑", sans-serif;
-            background: #7d5ba0;
+            background:
+                linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+                url('/static/202604.png') center center / cover no-repeat;
+            cursor: url('/static/mouse.cur') 0 0, auto;
             color: #fff;
             display: flex;
             justify-content: center;
@@ -66,6 +69,35 @@
             position: relative;
             padding: 0 1rem 80px 1rem;
             box-sizing: border-box;
+        }
+
+        a,
+        button,
+        [role="button"],
+        input[type="button"],
+        input[type="submit"] {
+            cursor: url('/static/mouse.cur') 0 0, pointer;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            html.custom-cursor-enabled,
+            html.custom-cursor-enabled * {
+                cursor: none !important;
+            }
+
+            .fake-cursor {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 48px;
+                height: 48px;
+                background: url('/static/mouse.gif') center center / contain no-repeat;
+                image-rendering: pixelated;
+                pointer-events: none;
+                z-index: 99999;
+                transform: translate3d(-9999px, -9999px, 0);
+                will-change: transform;
+            }
         }
 
         .main-content {
@@ -996,6 +1028,44 @@
             }
             
             animate();
+        })();
+    </script>
+    <script>
+        // 动画伪光标（仅桌面端）
+        (function() {
+            const canUseCustomCursor = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+            if (!canUseCustomCursor) {
+                return;
+            }
+
+            const root = document.documentElement;
+            root.classList.add('custom-cursor-enabled');
+
+            const cursorEl = document.createElement('div');
+            cursorEl.className = 'fake-cursor';
+            cursorEl.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(cursorEl);
+
+            const hotspotX = 6;
+            const hotspotY = 6;
+            let x = -9999;
+            let y = -9999;
+
+            function updateCursorPosition() {
+                cursorEl.style.transform = `translate3d(${x - hotspotX}px, ${y - hotspotY}px, 0)`;
+            }
+
+            document.addEventListener('mousemove', (event) => {
+                x = event.clientX;
+                y = event.clientY;
+                updateCursorPosition();
+            }, { passive: true });
+
+            document.addEventListener('mouseleave', () => {
+                x = -9999;
+                y = -9999;
+                updateCursorPosition();
+            });
         })();
     </script>
 </body>

@@ -18,19 +18,66 @@
             padding: 0;
         }
 
+        :root {
+            --home-bg-translate-x: 0px;
+            --home-bg-translate-y: 0px;
+            --home-bg-scale: 1;
+        }
+
         body {
             margin: 0;
             padding: 0;
             font-family: "微软雅黑", sans-serif;
-            background: linear-gradient(135deg, #7d5ba0 0%, #5a3d7a 50%, #3d2a5a 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            background: #0f0f14;
+            cursor: url('/static/mouse.cur') 0 0, auto;
             color: #fff;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             position: relative;
             overflow-x: hidden;
+        }
+
+        a,
+        button,
+        [role="button"],
+        input[type="button"],
+        input[type="submit"] {
+            cursor: url('/static/mouse.cur') 0 0, pointer;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            html.custom-cursor-enabled,
+            html.custom-cursor-enabled * {
+                cursor: none !important;
+            }
+
+            .fake-cursor {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 48px;
+                height: 48px;
+                background: url('/static/mouse.gif') center center / contain no-repeat;
+                image-rendering: pixelated;
+                pointer-events: none;
+                z-index: 99999;
+                transform: translate3d(-9999px, -9999px, 0);
+                will-change: transform;
+            }
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+                url('/static/202604.png') center center / cover no-repeat;
+            transform: translate(var(--home-bg-translate-x), var(--home-bg-translate-y)) scale(var(--home-bg-scale));
+            transform-origin: center center;
+            z-index: -2;
+            pointer-events: none;
         }
 
         /* 背景渐变流动动画 */
@@ -3773,6 +3820,44 @@
                 }, { passive: false });
             }
         }
+    </script>
+    <script>
+        // 动画伪光标（仅桌面端）
+        (function() {
+            const canUseCustomCursor = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+            if (!canUseCustomCursor) {
+                return;
+            }
+
+            const root = document.documentElement;
+            root.classList.add('custom-cursor-enabled');
+
+            const cursorEl = document.createElement('div');
+            cursorEl.className = 'fake-cursor';
+            cursorEl.setAttribute('aria-hidden', 'true');
+            document.body.appendChild(cursorEl);
+
+            const hotspotX = 0;
+            const hotspotY = 0;
+            let x = -9999;
+            let y = -9999;
+
+            function updateCursorPosition() {
+                cursorEl.style.transform = `translate3d(${x - hotspotX}px, ${y - hotspotY}px, 0)`;
+            }
+
+            document.addEventListener('mousemove', (event) => {
+                x = event.clientX;
+                y = event.clientY;
+                updateCursorPosition();
+            }, { passive: true });
+
+            document.addEventListener('mouseleave', () => {
+                x = -9999;
+                y = -9999;
+                updateCursorPosition();
+            });
+        })();
     </script>
 </body>
 </html>
