@@ -2407,7 +2407,8 @@
          */
         let postsData = {};  // 存储按年月分类的视频数据：{ "2024-01": [...], "2024-02": [...] }
         let updatePostsDisplay = null;  // 投稿展示更新函数（在fetchAndOrganizeVideos中定义）
-        const VIDEOS_API_URL = 'https://dataapi.kabikingu.com/videos';  // 视频列表API地址
+        const API_BASE_URL = 'http://api.kabikingu.com';
+        const VIDEOS_API_URL = `${API_BASE_URL}/videos`;  // 视频列表API地址
         
         /**
          * 处理封面URL
@@ -2423,22 +2424,23 @@
                 coverUrl = coverUrl.replace('https://https://', 'https://');
             }
             
-            // 检查是否是代理 URL (dataapi.kabikingu.com/image?url=...)
-            if (coverUrl.includes('dataapi.kabikingu.com/image?url=')) {
-                // 提取原始 URL
+            // 新API中的 coverLocal（例如 /covers/xxx.jpg）直接透传
+            if (coverUrl.startsWith('/covers/')) {
+                return `${API_BASE_URL}${coverUrl}`;
+            }
+
+            // 旧代理 URL 兼容处理：提取原图 URL 后直接使用
+            if (coverUrl.includes('/image?url=')) {
                 const urlMatch = coverUrl.match(/url=([^&]+)/);
                 if (urlMatch) {
                     try {
                         const originalUrl = decodeURIComponent(urlMatch[1]);
-                        // 对原始 URL 添加压缩后缀
-                        const compressedUrl = addBilibiliImageSuffix(originalUrl);
-                        // 重新构建代理 URL
-                        return `https://dataapi.kabikingu.com/image?url=${encodeURIComponent(compressedUrl)}`;
+                        return addBilibiliImageSuffix(originalUrl);
                     } catch (e) {
-                        console.warn('处理封面 URL 失败:', e);
-                        return coverUrl;
+                        console.warn('处理旧代理封面 URL 失败:', e);
                     }
                 }
+                return '';
             } else {
                 // 直接是原始 URL，直接添加后缀
                 return addBilibiliImageSuffix(coverUrl);
@@ -2492,7 +2494,7 @@
          */
         async function fetchAndOrganizeVideos() {
             try {
-                const url = `${VIDEOS_API_URL}?mid=${USER_MID}`;
+                const url = VIDEOS_API_URL;
                 
                 const response = await fetch(url);
                 
@@ -2504,14 +2506,14 @@
                 const data = await response.json();
                 
                 // 检查API返回的错误
-                if (data.error) {
-                    console.error('获取投稿数据失败:', data.error);
-                    throw new Error(data.error);
+                if (data.ok === false) {
+                    console.error('获取投稿数据失败:', data.message);
+                    throw new Error(data.message || '获取投稿数据失败');
                 }
                 
                 // 检查数据格式
-                if (!data.videos || !Array.isArray(data.videos)) {
-                    console.warn('API返回数据格式不正确，期望data.videos为数组，实际:', data);
+                if (!Array.isArray(data.data)) {
+                    console.warn('API返回数据格式不正确，期望data.data为数组，实际:', data);
                     throw new Error('API返回数据格式不正确');
                 }
                 
@@ -2519,7 +2521,7 @@
                 postsData = {};
                 
                 // 处理每个视频，根据时间戳分类到年月
-                data.videos.forEach(video => {
+                data.data.forEach(video => {
                     const pubDate = new Date(video.pubdate * 1000); // Unix时间戳转Date对象
                     const year = pubDate.getFullYear();
                     const month = pubDate.getMonth() + 1; // getMonth() 返回 0-11，需要+1
@@ -2538,7 +2540,8 @@
                     }
                     
                     // 处理封面 URL，添加压缩后缀
-                    let coverUrl = processCoverUrl(video.cover || '');
+                    const coverSource = video.coverLocal || video.cover || '';
+                    let coverUrl = processCoverUrl(coverSource);
                     
                     // 添加视频数据
                     postsData[year][month].push({
@@ -3442,9 +3445,6 @@
         // Bilibili 空间嵌入模块 - 固定URL
         // 用户统计信息更新
         // 使用新的数据 API
-        const API_BASE_URL = 'https://dataapi.kabikingu.com';
-        const UPDATE_INTERVAL = 5000; // 5秒
-
         const followerCountEl = document.getElementById('followerCount');
         const likeCountEl = document.getElementById('likeCount');
 
@@ -3616,12 +3616,12 @@
          */
         
         /**
-         * 获取用户卡片信息（通过 Cloudflare Workers API）
-         * 注意：只有数值增长时才会更新，避免不必要的动画
+         * 获取用户卡片信息（通过 kabi-api）
+         * /card 已有服务端缓存，这里只做页面加载时拉取
          */
         async function fetchUserCard() {
             try {
-                const url = `${API_BASE_URL}?mid=${USER_MID}`;
+                const url = `${API_BASE_URL}/card?mid=${USER_MID}`;
                 
                 const response = await fetch(url);
                 
@@ -3632,16 +3632,20 @@
                 
                 const data = await response.json();
                 
-                if (data.error) {
-                    console.error('获取用户卡片信息失败:', data.error);
-                    followerCountEl.textContent = `错误: ${data.error}`;
-                    likeCountEl.textContent = `错误: ${data.error}`;
+                if (data.ok === false) {
+                    console.error('获取用户卡片信息失败:', data.message);
+                    followerCountEl.textContent = `错误: ${data.message || '请求失败'}`;
+                    likeCountEl.textContent = `错误: ${data.message || '请求失败'}`;
                     return;
                 }
 
+                // 新API返回结构：
+                // { ok, source, updatedAt, data: { code, data: { follower, like_num, card... } } }
+                const cardPayload = data?.data?.data || {};
+
                 // 更新粉丝数（只有增长时才动画）
-                if (data.follower !== undefined && data.follower !== null) {
-                    const newFollower = data.follower;
+                if (cardPayload.follower !== undefined && cardPayload.follower !== null) {
+                    const newFollower = cardPayload.follower;
                     // 只有数值增长时才执行动画并更新
                     if (currentFollower === null || newFollower > currentFollower) {
                         animateNumber(followerCountEl, newFollower, currentFollower);
@@ -3655,8 +3659,8 @@
                 }
 
                 // 更新获赞数（只有增长时才动画）
-                if (data.like_num !== undefined && data.like_num !== null) {
-                    const newLikeNum = data.like_num;
+                if (cardPayload.like_num !== undefined && cardPayload.like_num !== null) {
+                    const newLikeNum = cardPayload.like_num;
                     // 只有数值增长时才执行动画并更新
                     if (currentLikeNum === null || newLikeNum > currentLikeNum) {
                         animateNumber(likeCountEl, newLikeNum, currentLikeNum);
@@ -3679,11 +3683,8 @@
             }
         }
 
-        // 立即执行一次（页面加载时）
+        // 页面加载时拉取一次（/card 已有服务端缓存）
         fetchUserCard();
-
-        // 定期更新（每5秒执行一次）
-        setInterval(fetchUserCard, UPDATE_INTERVAL);
 
         /**
          * ============================================
